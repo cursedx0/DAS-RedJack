@@ -173,7 +173,7 @@ public class PlayActivity extends BaseActivity {
         LinearLayoutManager elLayoutLinealDealer= new LinearLayoutManager(getBaseContext(),LinearLayoutManager.HORIZONTAL,false);
         rvDealer.setLayoutManager(elLayoutLinealDealer);
 
-        tusaldo.setText(getString(R.string.tusaldo)+Integer.toString(saldo));
+        tusaldo.setText(getString(R.string.tusaldo)+": "+Integer.toString(saldo));
 
         buttonApostar.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -435,15 +435,17 @@ public class PlayActivity extends BaseActivity {
         finComun();
         EndDialog endDialog = new EndDialog(0, saldo, apuesta);
         endDialog.show(getSupportFragmentManager(), "lost_dialog");
+        tusaldo.setText(getString(R.string.tusaldo)+": "+saldo);
         //el dinero se quita al empezar la partida
     }
 
     private void jugadorGana(){
         finComun();
+        saldo = saldo + apuesta*2;
         EndDialog endDialog = new EndDialog(1, saldo, apuesta);
         endDialog.show(getSupportFragmentManager(), "win_dialog");
         //dar dinero
-        saldo = saldo + apuesta*2;
+        tusaldo.setText(getString(R.string.tusaldo)+": "+saldo);
         ContentValues modificacion = new ContentValues();
         modificacion.put("Coins",Integer.toString(saldo));
         bd.update("Usuarios", modificacion, "Id=?",new String[]{Integer.toString(id)});
@@ -451,9 +453,10 @@ public class PlayActivity extends BaseActivity {
 
     private void empate(){
         finComun();
+        saldo = saldo + apuesta;
         EndDialog endDialog = new EndDialog(2, saldo, apuesta);
         endDialog.show(getSupportFragmentManager(), "draw_dialog");
-        saldo = saldo + apuesta;
+        tusaldo.setText(getString(R.string.tusaldo)+": "+saldo);
         ContentValues modificacion = new ContentValues();
         modificacion.put("Coins",Integer.toString(saldo));
         bd.update("Usuarios", modificacion, "Id=?",new String[]{Integer.toString(id)});
