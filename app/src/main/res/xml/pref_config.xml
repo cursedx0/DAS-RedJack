@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/idioma" android:key="cat_datos_personales">
+        <ListPreference
+            android:defaultValue="1"
+            android:entries="@array/idiomas"
+            android:entryValues="@array/idiomasCodes"
+            android:key="idioma"
+            android:title="@string/eligeIdioma" />
+    </PreferenceCategory>
+    <PreferenceCategory android:title="@string/tema">
+
+        <ListPreference
+            android:defaultValue="1"
+            android:entries="@array/fondos"
+            android:entryValues="@array/fondosCodes"
+            android:key="tema"
+            android:title="@string/eligeTema" />
+    </PreferenceCategory>
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="notis_login"
+        android:title="@string/notisLogin"
+        app:summary="@string/expNotisLogin" />
+    <Preference
+        android:key="salir"
+        android:title="@string/salir"
+        android:summary="@string/salirPrefs"/>
+</PreferenceScreen>
