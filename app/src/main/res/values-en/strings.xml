@@ -58,4 +58,7 @@
     <string name="compartir">Share</string>
     <string name="recomendacion">I played RedJack and had a lot of fun!</string>
     <string name="prefsDeshabilitadas">Options (finish your game)</string>
+    <string name="apuesta">Bet</string>
+    <string name="historialPartidas">Game history</string>
+    <string name="historial">History</string>
 </resources>

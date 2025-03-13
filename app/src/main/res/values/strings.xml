@@ -60,4 +60,7 @@
     <string name="compartir">Compartir</string>
     <string name="recomendacion">¡Jugué a RedJack y lo pasé bomba!</string>
     <string name="prefsDeshabilitadas">Preferencias (termina la ronda)</string>
+    <string name="apuesta">Apuesta</string>
+    <string name="historialPartidas">Historial de partidas</string>
+    <string name="historial">Historial</string>
 </resources>

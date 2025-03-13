@@ -36,19 +36,26 @@ import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
 
 public class PlayActivity extends BaseActivity {
-
     private boolean jugandoFlag = false;
     private int saldo;
     private int id;
     private String nombre;
     private int puntos;
     private int[] posiblespuntos;
-    private int[] posiblesdealer;
+    private int[] posiblesdealer = new int[]{0,0,0}; //debe inicializarse para que pueda accederse si el jugador pierde en su turno
     private int totalElegido = 2; //0: total 1 (más bajo), 1: total 2 (más alto), 2: desactivado
     private boolean turnoJugador = false;
     private Baraja miBaraja = new Baraja();
@@ -437,18 +444,23 @@ public class PlayActivity extends BaseActivity {
         endDialog.show(getSupportFragmentManager(), "lost_dialog");
         tusaldo.setText(getString(R.string.tusaldo)+": "+saldo);
         //el dinero se quita al empezar la partida
+        verificarArchivo();
+        guardarPartida(formatearResultado(saldo,apuesta,puntos,posiblesdealer,getString(R.string.hasganado)));
     }
 
     private void jugadorGana(){
         finComun();
         saldo = saldo + apuesta*2;
-        EndDialog endDialog = new EndDialog(1, saldo, apuesta);
+        EndDialog endDialog = new EndDialog(1, saldo, apuesta*2); //se gana el doble de monedas que las que se apuestan
         endDialog.show(getSupportFragmentManager(), "win_dialog");
         //dar dinero
         tusaldo.setText(getString(R.string.tusaldo)+": "+saldo);
         ContentValues modificacion = new ContentValues();
         modificacion.put("Coins",Integer.toString(saldo));
         bd.update("Usuarios", modificacion, "Id=?",new String[]{Integer.toString(id)});
+
+        verificarArchivo();
+        guardarPartida(formatearResultado(saldo,apuesta,puntos,posiblesdealer,getString(R.string.hasganado)));
     }
 
     private void empate(){
@@ -460,6 +472,9 @@ public class PlayActivity extends BaseActivity {
         ContentValues modificacion = new ContentValues();
         modificacion.put("Coins",Integer.toString(saldo));
         bd.update("Usuarios", modificacion, "Id=?",new String[]{Integer.toString(id)});
+
+        verificarArchivo();
+        guardarPartida(formatearResultado(saldo,apuesta,puntos,posiblesdealer,getString(R.string.empate)));
     }
 
     private void compartirResultado(int resultado) {
@@ -472,6 +487,67 @@ public class PlayActivity extends BaseActivity {
         // Verifica que haya una app que pueda manejar el Intent
         if (intent.resolveActivity(getPackageManager()) != null) {
             startActivity(Intent.createChooser(intent, getString(R.string.compartir)));
+        }
+    }
+
+    private void verificarArchivo() {
+        File archivo = new File(getFilesDir(), FILE_NAME);
+        if (!archivo.exists()) { //si no existe
+            try {
+                archivo.createNewFile(); //lo crea
+            } catch (IOException e) { //si falla la creación
+                e.printStackTrace(); //logear
+            }
+        }
+    }
+
+    public String formatearResultado(int saldo, int apuesta, int puntos, int[] posiblesdealer, String resultado){
+        String dpuntos;
+        if (posiblesdealer[0]==posiblesdealer[1]){
+            dpuntos = posiblesdealer[0]+""; //resultado sin ases
+        }else {
+            dpuntos = posiblesdealer[0] + " " + getString(R.string.o) + " " + posiblesdealer[1]; //resultado con ases
+        }
+        return new String(Calendar.getInstance().getTime()+" | " + getString(R.string.tusaldo) +": " +saldo+" | "+ getString(R.string.apuesta) + ": " + apuesta+" | "+getString(R.string.tupuntuacion)+": "+puntos+" | "+getString(R.string.dealer)+": "+dpuntos+" | "+resultado);
+
+    }
+
+    public void guardarPartida(String resultadoPartida) {
+        List<String> historial = new ArrayList<>();
+
+        // Leer el historial existente
+        try {
+            FileInputStream fis = openFileInput(FILE_NAME);
+            BufferedReader lector = new BufferedReader(new InputStreamReader(fis));
+            String linea;
+            while ((linea = lector.readLine()) != null) {
+                historial.add(linea);
+            }
+            lector.close();
+            Log.i("BUENAS", getFilesDir()+"");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        // Agregar el nuevo resultado
+        historial.add(0,resultadoPartida);
+        historial.add(0,""); //linea vacia para mejor visualización
+
+        // Mantener solo las últimas 10 partidas
+        if (historial.size() > 40) { //20 partidas, 20 lineas vacias
+            historial.remove(historial.size() - 1); //elimina la partida más antigua
+            historial.remove(historial.size() - 1); //y su línea vacía correspondiente
+        }
+
+        // Guardar el historial actualizado
+        try {
+            FileOutputStream fos = openFileOutput(FILE_NAME, MODE_PRIVATE);
+            for (String partida:historial) {
+                fos.write((partida + "\n").getBytes()); //TODO arreglar desaparicion de partidas de historial
+            }
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
@@ -521,7 +597,7 @@ public class PlayActivity extends BaseActivity {
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                 findViewById(R.id.fragmentContainer).setVisibility(View.VISIBLE);
                 transaction.replace(R.id.fragmentContainer, prefs);
-                transaction.addToBackStack(null); // Para poder regresar al fragmento anterior
+                //transaction.addToBackStack(null); // Para poder regresar al fragmento anterior
                 transaction.commit();
                 break;
             }
@@ -532,6 +608,11 @@ public class PlayActivity extends BaseActivity {
                 }else{
                     finish();
                 }
+                break;
+            }
+            case R.id.hist:{
+                Intent intent = new Intent(PlayActivity.this, HistoryActivity.class);
+                startActivity(intent); //no se le pasas nada porque el nombre del archivo está en baseActivity
                 break;
             }
         }

@@ -23,6 +23,7 @@ import java.util.Locale;
 public abstract class BaseActivity extends AppCompatActivity {
     protected static final String LANGUAGE_KEY = "language_key";
     protected boolean NOTIS_LOGIN;
+    protected static final String FILE_NAME = "history.txt";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
