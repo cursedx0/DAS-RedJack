@@ -57,7 +57,6 @@ public class PlayActivity extends BaseActivity {
     private int[] posiblespuntos;
     private int[] posiblesdealer = new int[]{0,0,0}; //debe inicializarse para que pueda accederse si el jugador pierde en su turno
     private int totalElegido = 2; //0: total 1 (más bajo), 1: total 2 (más alto), 2: desactivado
-    private boolean turnoJugador = false;
     private Baraja miBaraja = new Baraja();
     private int apuesta;
     private miBD GestorDB;
@@ -103,41 +102,6 @@ public class PlayActivity extends BaseActivity {
             return insets;
         });
 
-        //===== Notificación ========\\
-        if(NOTIS_LOGIN){
-            Context context = getApplicationContext(); // 🔹 Asegurar que tenemos un contexto válido
-            NotificationManager elManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-            if (elManager == null) {
-                Log.e("Notificación", "NotificationManager es null. No se puede crear la notificación.");
-                return;
-            }
-
-            String canalID = "LogIn";
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                NotificationChannel elCanal = new NotificationChannel(
-                        canalID, "Canal de Inicio de Sesión",
-                        NotificationManager.IMPORTANCE_HIGH
-                );
-                elCanal.setDescription("Notificación recibida al iniciar sesión.");
-                elCanal.setVibrationPattern(new long[]{0, 500, 500, 500});
-                elCanal.enableVibration(true);
-
-                elManager.createNotificationChannel(elCanal); // 🔹 Crear el canal antes de usarlo
-            }
-
-            // 🔹 Se necesita un ícono obligatorio en Android 8+ o la notificación fallará
-            NotificationCompat.Builder elBuilder = new NotificationCompat.Builder(context, canalID)
-                    .setSmallIcon(R.drawable.card_b_da_large)
-                    .setContentTitle("Inicio de sesión exitoso")
-                    .setContentText("Has iniciado sesión correctamente.")
-                    .setPriority(NotificationCompat.PRIORITY_HIGH)
-                    .setAutoCancel(true);
-
-            elManager.notify(1, elBuilder.build());
-        }
-
         //===== inic UI =====\\
         buttonApostar = findViewById(R.id.buttonApostar);
         buttonPlantarse = findViewById(R.id.buttonPlantarse);
@@ -169,6 +133,41 @@ public class PlayActivity extends BaseActivity {
             //si esto ocurre, el programa está condenado a fallar de todas formas
         }
 
+        //===== Notificación ========\\
+        if(NOTIS_LOGIN){
+            Context context = getApplicationContext(); // 🔹 Asegurar que tenemos un contexto válido
+            NotificationManager elManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+            if (elManager == null) {
+                Log.e("Notificación", "NotificationManager es null. No se puede crear la notificación.");
+                return;
+            }
+
+            String canalID = "LogIn";
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                NotificationChannel elCanal = new NotificationChannel(
+                        canalID, "Canal de Inicio de Sesión",
+                        NotificationManager.IMPORTANCE_HIGH
+                );
+                elCanal.setDescription("Notificación recibida al iniciar sesión.");
+                elCanal.setVibrationPattern(new long[]{0, 500, 500, 500});
+                elCanal.enableVibration(true);
+
+                elManager.createNotificationChannel(elCanal); // 🔹 Crear el canal antes de usarlo
+            }
+
+            // 🔹 Se necesita un ícono obligatorio en Android 8+ o la notificación fallará
+            NotificationCompat.Builder elBuilder = new NotificationCompat.Builder(context, canalID)
+                    .setSmallIcon(R.drawable.card_b_da_large)
+                    .setContentTitle(getString(R.string.bienvenido)+", "+nombre)
+                    .setContentText(getString(R.string.loginExitoso))
+                    .setPriority(NotificationCompat.PRIORITY_HIGH)
+                    .setAutoCancel(true);
+
+            elManager.notify(1, elBuilder.build());
+        }
+
         RecyclerView rvJugador = findViewById(R.id.rvJugador);
         RecyclerView rvDealer = findViewById(R.id.rvDealer);
 
@@ -197,11 +196,13 @@ public class PlayActivity extends BaseActivity {
                         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
                         View currentFocus = getCurrentFocus();
                         if (currentFocus != null && imm != null) {
-                            //oOcultar el teclado
+                            //ocultar el teclado
                             imm.hideSoftInputFromWindow(currentFocus.getWindowToken(), 0);
                         }
                         empezarPartida();
                     }
+                }else{
+                    Toast.makeText(getApplicationContext(), getString(R.string.apuestainvalida), Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -245,7 +246,6 @@ public class PlayActivity extends BaseActivity {
         buttonPlantarse.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                turnoJugador = false;
                 jugarDealer();
             }
         });
@@ -267,6 +267,7 @@ public class PlayActivity extends BaseActivity {
 
 
     private void empezarPartida() {
+        //=== inic ===\\
         jugandoFlag = true;
         totalElegido = 2;
         numAses = 0;
@@ -309,24 +310,6 @@ public class PlayActivity extends BaseActivity {
         comprobarAses();
 
         //jugarJugador();
-    }
-
-    private void jugarJugador(){
-        turnoJugador = true;
-        totalElegido = 2;
-
-        while(turnoJugador){
-            posiblespuntos = miBaraja.calcMano(miBaraja.getManoJugador());
-            if (posiblespuntos[1] != 0) {
-                if (totalElegido==2) {
-                    //se deberá elegir una puntuación antes de plantarse
-                    buttonPlantarse.setEnabled(false);
-                    textPuntosJugador.setText(getString(R.string.selecPuntuacion));
-                }
-            }else{
-                puntos = posiblespuntos[0];
-            }
-        }
     }
 
     private void comprobarAses() {
@@ -463,7 +446,7 @@ public class PlayActivity extends BaseActivity {
         guardarPartida(formatearResultado(saldo,apuesta,puntos,posiblesdealer,getString(R.string.hasganado)));
     }
 
-    private void empate(){
+    private void empate(){ //solo se da si ambos tienen 21
         finComun();
         saldo = saldo + apuesta;
         EndDialog endDialog = new EndDialog(2, saldo, apuesta);
@@ -597,7 +580,7 @@ public class PlayActivity extends BaseActivity {
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                 findViewById(R.id.fragmentContainer).setVisibility(View.VISIBLE);
                 transaction.replace(R.id.fragmentContainer, prefs);
-                //transaction.addToBackStack(null); // Para poder regresar al fragmento anterior
+                //transaction.addToBackStack(null); //para poder regresar al fragmento anterior
                 transaction.commit();
                 break;
             }

@@ -63,4 +63,7 @@
     <string name="apuesta">Apuesta</string>
     <string name="historialPartidas">Historial de partidas</string>
     <string name="historial">Historial</string>
+    <string name="noHistorial">No hay historial disponible.</string>
+    <string name="bienvenido">Bienvenido de nuevo</string>
+    <string name="loginExitoso">Has iniciado sesión con éxito.</string>
 </resources>

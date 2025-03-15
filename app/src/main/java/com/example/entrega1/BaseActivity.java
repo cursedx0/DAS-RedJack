@@ -28,11 +28,11 @@ public abstract class BaseActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Toolbar toolbar = findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar); // Esto debe estar dentro de onCreate()
+        setSupportActionBar(toolbar);
 
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         String savedTheme = prefs.getString("tema", "system");
-        setThemeMode(savedTheme, false);
+        setThemeMode(savedTheme, false); //establecer tema al crear actividad
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)!= PackageManager.PERMISSION_GRANTED) {
             //PEDIR EL PERMISO

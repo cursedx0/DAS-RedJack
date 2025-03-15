@@ -54,7 +54,7 @@ public class HistoryActivity extends BaseActivity {
             }
             lector.close();
         } catch (IOException e) {
-            historial.append("No hay historial disponible.");
+            historial.append(getString(R.string.noHistorial));
         }
         return historial.toString();
     }
