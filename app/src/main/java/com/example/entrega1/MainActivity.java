@@ -119,15 +119,14 @@ public class MainActivity extends BaseActivity {
                             elCanal.setVibrationPattern(new long[]{0, 500, 500, 500});
                             elCanal.enableVibration(true);
 
-                            elManager.createNotificationChannel(elCanal); // 🔹 Crear el canal antes de usarlo
+                            elManager.createNotificationChannel(elCanal); //crea canal
                         }
 
-                        // 🔹 Se necesita un ícono obligatorio en Android 8+ o la notificación fallará
                         NotificationCompat.Builder elBuilder = new NotificationCompat.Builder(context, canalID)
-                                .setSmallIcon(R.drawable.icono_rombo)
-                                .setContentTitle(getString(R.string.bienvenido)+", "+user)
-                                .setContentText(getString(R.string.loginExitoso))
-                                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                                .setSmallIcon(R.drawable.icono_rombo) //icono
+                                .setContentTitle(getString(R.string.bienvenido)+", "+user) //titulo
+                                .setContentText(getString(R.string.loginExitoso)) //texto
+                                .setPriority(NotificationCompat.PRIORITY_HIGH) //prioridad
                                 .setAutoCancel(true);
 
                         elManager.notify(1, elBuilder.build());
@@ -139,6 +138,8 @@ public class MainActivity extends BaseActivity {
                     startActivity(intent);
                 }else{
                     Toast.makeText(getApplicationContext(), getString(R.string.loginincorrecto), Toast.LENGTH_SHORT).show();
+                    iuser.setText(""); //evita overflow de peticiones
+                    ipw.setText("");
                 }
                 c.close();
             }
