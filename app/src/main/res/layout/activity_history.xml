@@ -9,8 +9,8 @@
 
     <TextView
         android:id="@+id/textHistory"
-        android:layout_width="352dp"
-        android:layout_height="494dp"
+        android:layout_width="354dp"
+        android:layout_height="518dp"
         android:text="TextView"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

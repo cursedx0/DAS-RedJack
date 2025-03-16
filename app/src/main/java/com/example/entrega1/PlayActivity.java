@@ -134,39 +134,7 @@ public class PlayActivity extends BaseActivity {
         }
 
         //===== Notificación ========\\
-        if(NOTIS_LOGIN){
-            Context context = getApplicationContext(); // 🔹 Asegurar que tenemos un contexto válido
-            NotificationManager elManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-            if (elManager == null) {
-                Log.e("Notificación", "NotificationManager es null. No se puede crear la notificación.");
-                return;
-            }
-
-            String canalID = "LogIn";
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                NotificationChannel elCanal = new NotificationChannel(
-                        canalID, "Canal de Inicio de Sesión",
-                        NotificationManager.IMPORTANCE_HIGH
-                );
-                elCanal.setDescription("Notificación recibida al iniciar sesión.");
-                elCanal.setVibrationPattern(new long[]{0, 500, 500, 500});
-                elCanal.enableVibration(true);
-
-                elManager.createNotificationChannel(elCanal); // 🔹 Crear el canal antes de usarlo
-            }
-
-            // 🔹 Se necesita un ícono obligatorio en Android 8+ o la notificación fallará
-            NotificationCompat.Builder elBuilder = new NotificationCompat.Builder(context, canalID)
-                    .setSmallIcon(R.drawable.card_b_da_large)
-                    .setContentTitle(getString(R.string.bienvenido)+", "+nombre)
-                    .setContentText(getString(R.string.loginExitoso))
-                    .setPriority(NotificationCompat.PRIORITY_HIGH)
-                    .setAutoCancel(true);
-
-            elManager.notify(1, elBuilder.build());
-        }
+        //desplazada a MainActivitity para evitar renotificaciones
 
         RecyclerView rvJugador = findViewById(R.id.rvJugador);
         RecyclerView rvDealer = findViewById(R.id.rvDealer);
@@ -300,7 +268,7 @@ public class PlayActivity extends BaseActivity {
         miBaraja.repartirJugador();
         miBaraja.repartirJugador();
 
-        rvadapterJugador.notifyItemRangeInserted(posicionInicial, 2);
+        rvadapterJugador.notifyItemRangeInserted(posicionInicial,2);
 
         // 2.2 ESCUCHAR EVENTOS DE CARTA Y PLANTARSE + UI
         buttonPlantarse.setVisibility(View.VISIBLE);
@@ -385,14 +353,15 @@ public class PlayActivity extends BaseActivity {
     }
 
     private void finDelJuego(){
-        miBaraja.getManoJugador().clear();
-        miBaraja.getManoDealer().clear();
+        miBaraja.vaciarMano(miBaraja.getManoDealer()); //devuelve las cartas de las manos al mazo
+        miBaraja.vaciarMano(miBaraja.getManoJugador());
         rvadapterJugador.notifyDataSetChanged();
         rvadapterDealer.notifyDataSetChanged();
 
         textPuntosJugador.setVisibility(View.INVISIBLE);
         textPuntosDealer.setVisibility(View.INVISIBLE);
         buttonPlantarse.setVisibility(View.INVISIBLE);
+        buttonPlantarse.setEnabled(true); //evita mantener bloqueo si se pierde sin elegir total
         buttonTotal1.setVisibility(View.INVISIBLE);
         buttonTotal2.setVisibility(View.INVISIBLE);
         buttonCarta.setVisibility(View.INVISIBLE);
@@ -424,18 +393,22 @@ public class PlayActivity extends BaseActivity {
     private void jugadorPierde(){
         finComun();
         EndDialog endDialog = new EndDialog(0, saldo, apuesta);
-        endDialog.show(getSupportFragmentManager(), "lost_dialog");
+        if (!isFinishing() && !isDestroyed()) {//si se sale y vuelve a entrar en la actividad justo antes de perder o ganar,cascaba
+            endDialog.show(getSupportFragmentManager(), "lost_dialog");
+        }
         tusaldo.setText(getString(R.string.tusaldo)+": "+saldo);
         //el dinero se quita al empezar la partida
         verificarArchivo();
-        guardarPartida(formatearResultado(saldo,apuesta,puntos,posiblesdealer,getString(R.string.hasganado)));
+        guardarPartida(formatearResultado(saldo,apuesta,puntos,posiblesdealer,getString(R.string.hasperdido)));
     }
 
     private void jugadorGana(){
         finComun();
         saldo = saldo + apuesta*2;
         EndDialog endDialog = new EndDialog(1, saldo, apuesta*2); //se gana el doble de monedas que las que se apuestan
-        endDialog.show(getSupportFragmentManager(), "win_dialog");
+        if (!isFinishing() && !isDestroyed()) {//si se sale y vuelve a entrar en la actividad justo antes de perder o ganar,cascaba
+            endDialog.show(getSupportFragmentManager(), "win_dialog");
+        }
         //dar dinero
         tusaldo.setText(getString(R.string.tusaldo)+": "+saldo);
         ContentValues modificacion = new ContentValues();
@@ -450,7 +423,9 @@ public class PlayActivity extends BaseActivity {
         finComun();
         saldo = saldo + apuesta;
         EndDialog endDialog = new EndDialog(2, saldo, apuesta);
-        endDialog.show(getSupportFragmentManager(), "draw_dialog");
+        if (!isFinishing() && !isDestroyed()) {//si se sale y vuelve a entrar en la actividad justo antes de perder o ganar,cascaba
+            endDialog.show(getSupportFragmentManager(), "draw_dialog");
+        }
         tusaldo.setText(getString(R.string.tusaldo)+": "+saldo);
         ContentValues modificacion = new ContentValues();
         modificacion.put("Coins",Integer.toString(saldo));
@@ -552,7 +527,7 @@ public class PlayActivity extends BaseActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         if (toolbar != null) {
             setSupportActionBar(toolbar);
-            getSupportActionBar().setTitle("Blackjack"); // Personalizar título
+            getSupportActionBar().setTitle("RedJack"); // Personalizar título
         }
         getMenuInflater().inflate(R.menu.toolbar_menu,menu);
         buttonPrefs = menu.findItem(R.id.prefs);
@@ -595,6 +570,7 @@ public class PlayActivity extends BaseActivity {
             }
             case R.id.hist:{
                 Intent intent = new Intent(PlayActivity.this, HistoryActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 startActivity(intent); //no se le pasas nada porque el nombre del archivo está en baseActivity
                 break;
             }

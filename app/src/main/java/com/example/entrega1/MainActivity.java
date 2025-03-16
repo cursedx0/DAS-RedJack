@@ -1,6 +1,9 @@
 package com.example.entrega1;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
@@ -14,6 +17,7 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -90,9 +94,48 @@ public class MainActivity extends BaseActivity {
                     int userid = c.getInt(0);
                     int usercoins = c.getInt(3);
                     Intent intent = new Intent(MainActivity.this, PlayActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                     intent.putExtra("id", userid);
                     intent.putExtra("name", user);
                     intent.putExtra("coins", usercoins);
+
+                    if(NOTIS_LOGIN){ //la notificación se manda aquí, porque de mandarse en el onCreate de PlayActivity se mandaría cada vez que se recree la actividad (como al cambiar el tema o idioma)
+                        Context context = getApplicationContext(); // 🔹 Asegurar que tenemos un contexto válido
+                        NotificationManager elManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+                        if (elManager == null) {
+                            Log.e("Notificación", "NotificationManager es null. No se puede crear la notificación.");
+                            return;
+                        }
+
+                        String canalID = "LogIn";
+
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                            NotificationChannel elCanal = new NotificationChannel(
+                                    canalID, "Canal de Inicio de Sesión",
+                                    NotificationManager.IMPORTANCE_HIGH
+                            );
+                            elCanal.setDescription("Notificación recibida al iniciar sesión.");
+                            elCanal.setVibrationPattern(new long[]{0, 500, 500, 500});
+                            elCanal.enableVibration(true);
+
+                            elManager.createNotificationChannel(elCanal); // 🔹 Crear el canal antes de usarlo
+                        }
+
+                        // 🔹 Se necesita un ícono obligatorio en Android 8+ o la notificación fallará
+                        NotificationCompat.Builder elBuilder = new NotificationCompat.Builder(context, canalID)
+                                .setSmallIcon(R.drawable.icono_rombo)
+                                .setContentTitle(getString(R.string.bienvenido)+", "+user)
+                                .setContentText(getString(R.string.loginExitoso))
+                                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                                .setAutoCancel(true);
+
+                        elManager.notify(1, elBuilder.build());
+                    }
+
+                    iuser.setText(""); //evita overflow de peticiones
+                    ipw.setText("");
+
                     startActivity(intent);
                 }else{
                     Toast.makeText(getApplicationContext(), getString(R.string.loginincorrecto), Toast.LENGTH_SHORT).show();

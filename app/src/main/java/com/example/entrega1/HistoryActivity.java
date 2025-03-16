@@ -2,12 +2,14 @@ package com.example.entrega1;
 
 import android.os.Bundle;
 import android.text.method.ScrollingMovementMethod;
+import android.view.Menu;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -24,6 +26,7 @@ public class HistoryActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_history);
+        setSupportActionBar(findViewById(R.id.toolbar2));
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -58,4 +61,14 @@ public class HistoryActivity extends BaseActivity {
         }
         return historial.toString();
     }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        Toolbar toolbar = findViewById(R.id.toolbar2);
+        if (toolbar != null) {
+            setSupportActionBar(toolbar);
+            getSupportActionBar().setTitle(getString(R.string.historial)); // Personalizar título
+        }
+        return true;
+    }
+
 }

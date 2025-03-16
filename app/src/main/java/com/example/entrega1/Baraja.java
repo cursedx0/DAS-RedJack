@@ -93,6 +93,13 @@ public class Baraja {
         return new int[]{total,total2,numAses};
     }
 
+    public void vaciarMano(List<String> mano){
+        while(!mano.isEmpty()){
+            mazo.add(mano.get(0));
+            mano.remove(0);
+        }
+    }
+
     public List<String> getMazo(){
         return this.mazo;
     }

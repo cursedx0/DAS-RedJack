@@ -34,7 +34,7 @@ public class ElAdaptadorRecycler extends RecyclerView.Adapter<ElViewHolder> {
         if (resourceId != 0) {
             holder.laimagen.setImageResource(resourceId);
         } else {
-            holder.laimagen.setImageResource(R.drawable.mkicon413x431);
+            holder.laimagen.setImageResource(R.drawable.icono_rombo);
         }
 
     }
