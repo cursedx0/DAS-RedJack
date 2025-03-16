@@ -15,8 +15,8 @@
 
         <ImageView
             android:id="@+id/foto"
-            android:layout_width="113dp"
-            android:layout_height="169dp" />
+            android:layout_width="98dp"
+            android:layout_height="142dp" />
     </androidx.cardview.widget.CardView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

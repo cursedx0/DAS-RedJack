@@ -112,4 +112,12 @@ public class Baraja {
         return this.manoJugador;
     }
 
+    public void setManoJugador(List<String> cartas){
+        manoJugador.addAll(cartas);
+    }
+
+    public void setManoDealer(List<String> cartas){
+        manoDealer.addAll(cartas);
+    }
+
 }

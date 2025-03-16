@@ -18,10 +18,19 @@ public class EndDialog extends DialogFragment {
     private String msg;
     private String title;
 
-    public EndDialog(int result, int saldo, int apuesta){
-        this.result = result;
+    public EndDialog(){
+
+    }
+
+    public static EndDialog newIntance(int result, int saldo, int apuesta){
+        /*this.result = result;
         this.saldo = saldo;
-        this.apuesta = apuesta;
+        this.apuesta = apuesta;*/
+        EndDialog myEndDialog = new EndDialog();
+        myEndDialog.result=result;
+        myEndDialog.saldo=saldo;
+        myEndDialog.apuesta=apuesta;
+        return myEndDialog;
     }
 
     /*dialogListener miListener;

@@ -5,6 +5,9 @@ import android.app.NotificationManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.opengl.Visibility;
@@ -50,6 +53,9 @@ import java.util.List;
 
 public class PlayActivity extends BaseActivity {
     private boolean jugandoFlag = false;
+    private boolean turnoJugador = false;
+    private boolean pantallaFinal = false;
+    private boolean pregunta = false;
     private int saldo;
     private int id;
     private String nombre;
@@ -125,9 +131,15 @@ public class PlayActivity extends BaseActivity {
 
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            saldo = extras.getInt("coins");
+            //saldo = extras.getInt("coins");
             id = extras.getInt("id");
             nombre = extras.getString("name");
+            Cursor c = bd.rawQuery("SELECT * FROM Usuarios WHERE Id=?", new String[]{id+""}); //peticion extra para volver a pedir coins en caso de rotar pantalla
+            if (c.getCount()==1 && c.moveToFirst()) {
+                saldo = c.getInt(3);
+            }else{
+                saldo = 0;
+            }
         }else{
             saldo = 0;
             //si esto ocurre, el programa está condenado a fallar de todas formas
@@ -236,7 +248,9 @@ public class PlayActivity extends BaseActivity {
 
     private void empezarPartida() {
         //=== inic ===\\
+        posiblesdealer = new int[]{0,0,0};
         jugandoFlag = true;
+        turnoJugador = true;
         totalElegido = 2;
         numAses = 0;
         //======= UI ========\\
@@ -318,6 +332,16 @@ public class PlayActivity extends BaseActivity {
     }
 
     private void jugarDealer(){
+        turnoJugador = false;
+
+        int currentOrientation = getResources().getConfiguration().orientation;
+
+        if (currentOrientation == Configuration.ORIENTATION_LANDSCAPE) {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        } else {
+            setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        }
+
         //ocultar controles de jugador
         buttonPlantarse.setVisibility(View.INVISIBLE);
         buttonCarta.setVisibility(View.INVISIBLE);
@@ -380,6 +404,11 @@ public class PlayActivity extends BaseActivity {
     private void finComun(){
         jugandoFlag = false;
 
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED);
+        if(posiblesdealer[0]==0) {
+            textPuntosDealer.setText(getString(R.string.dealer) + ": " + posiblesdealer[0]);
+        }
+        textPuntosDealer.setVisibility(View.VISIBLE);
         buttonReplay.setVisibility(View.VISIBLE);
         buttonCompartir.setVisibility(View.VISIBLE);
 
@@ -392,7 +421,7 @@ public class PlayActivity extends BaseActivity {
 
     private void jugadorPierde(){
         finComun();
-        EndDialog endDialog = new EndDialog(0, saldo, apuesta);
+        EndDialog endDialog = EndDialog.newIntance(0, saldo, apuesta);
         if (!isFinishing() && !isDestroyed()) {//si se sale y vuelve a entrar en la actividad justo antes de perder o ganar,cascaba
             endDialog.show(getSupportFragmentManager(), "lost_dialog");
         }
@@ -405,7 +434,7 @@ public class PlayActivity extends BaseActivity {
     private void jugadorGana(){
         finComun();
         saldo = saldo + apuesta*2;
-        EndDialog endDialog = new EndDialog(1, saldo, apuesta*2); //se gana el doble de monedas que las que se apuestan
+        EndDialog endDialog = EndDialog.newIntance(1, saldo, apuesta); //se gana el doble de monedas que las que se apuestan
         if (!isFinishing() && !isDestroyed()) {//si se sale y vuelve a entrar en la actividad justo antes de perder o ganar,cascaba
             endDialog.show(getSupportFragmentManager(), "win_dialog");
         }
@@ -422,7 +451,7 @@ public class PlayActivity extends BaseActivity {
     private void empate(){ //solo se da si ambos tienen 21
         finComun();
         saldo = saldo + apuesta;
-        EndDialog endDialog = new EndDialog(2, saldo, apuesta);
+        EndDialog endDialog = EndDialog.newIntance(2, saldo, apuesta);
         if (!isFinishing() && !isDestroyed()) {//si se sale y vuelve a entrar en la actividad justo antes de perder o ganar,cascaba
             endDialog.show(getSupportFragmentManager(), "draw_dialog");
         }
@@ -577,6 +606,89 @@ public class PlayActivity extends BaseActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        // Guardar valores importantes
+        outState.putInt("puntos", puntos);
+        outState.putInt("apuesta",apuesta);
+        outState.putInt("saldo",saldo);
+        outState.putInt("id",id);
+        outState.putIntArray("posiblespuntos", posiblespuntos);
+        outState.putIntArray("posiblesdealer", posiblesdealer);
+        outState.putStringArrayList("mazo", new ArrayList<String>(miBaraja.getMazo()));
+        outState.putStringArrayList("manoJugador", new ArrayList<String>(miBaraja.getManoJugador()));
+        outState.putStringArrayList("manoDealer", new ArrayList<String>(miBaraja.getManoDealer()));
+        outState.putBoolean("jugandoFlag", jugandoFlag);
+        outState.putBoolean("turnoJugador", textPuntosDealer.getVisibility()==View.INVISIBLE);
+        outState.putBoolean("pantallaFinal", buttonReplay.getVisibility()==View.VISIBLE);
+        outState.putBoolean("pregunta", buttonTotal1.getVisibility()==View.VISIBLE); //si está desactivado, se le está preguntando al jugador por la puntuación a usar
+        outState.putInt("numAses",numAses);
+        outState.putBoolean("enablePrefs",enablePrefs);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        // Restaurar valores guardados
+        id = savedInstanceState.getInt("id");
+        saldo = savedInstanceState.getInt("saldo");
+        apuesta = savedInstanceState.getInt("apuesta");
+        puntos = savedInstanceState.getInt("puntos");
+        posiblespuntos = savedInstanceState.getIntArray("posiblespuntos");
+        posiblesdealer = savedInstanceState.getIntArray("posiblesdealer");
+        miBaraja.setManoJugador(savedInstanceState.getStringArrayList("manoJugador"));
+        rvadapterJugador.notifyDataSetChanged();
+        miBaraja.setManoDealer(savedInstanceState.getStringArrayList("manoDealer"));
+        rvadapterDealer.notifyDataSetChanged();
+        jugandoFlag = savedInstanceState.getBoolean("jugandoFlag");
+        pantallaFinal = savedInstanceState.getBoolean("pantallaFinal");
+        pregunta = savedInstanceState.getBoolean("pregunta");
+        numAses = savedInstanceState.getInt("numAses");
+        turnoJugador = savedInstanceState.getBoolean(("turnoJugador"));
+        enablePrefs = savedInstanceState.getBoolean("enablePrefs");
+        // Actualizar la UI con los datos restaurados
+        actualizarUI();
+    }
+
+    public void actualizarUI(){
+        if(!enablePrefs){
+            iapuesta.setVisibility(View.INVISIBLE);
+            buttonApostar.setVisibility(View.INVISIBLE);
+            tusaldo.setVisibility(View.INVISIBLE);
+            textPuntosJugador.setVisibility(View.VISIBLE);
+            textPuntosJugador.setText(getString(R.string.tupuntuacion)+": "+puntos);
+            if(turnoJugador){
+                buttonCarta.setVisibility(View.VISIBLE);
+                buttonPlantarse.setVisibility(View.VISIBLE);
+                if(pregunta){
+                    buttonPlantarse.setEnabled(false);
+                    textPuntosJugador.setText(getString(R.string.selecPuntuacion));
+                    buttonTotal1.setText(posiblespuntos[0]+"");
+                    buttonTotal2.setText(posiblespuntos[1]+"");
+                    buttonTotal1.setVisibility(View.VISIBLE);
+                    buttonTotal2.setVisibility(View.VISIBLE);
+                }else{
+                    buttonPlantarse.setEnabled(true);
+                }
+            }else if(!jugandoFlag){
+                if(posiblesdealer[0]!=posiblesdealer[1]){
+                    textPuntosDealer.setText(getString(R.string.dealer)+": "+posiblesdealer[0]+" "+getString(R.string.o)+" "+posiblesdealer[1]);
+                }else{
+                    textPuntosDealer.setText(getString(R.string.dealer)+": "+posiblesdealer[0]);
+                }
+                textPuntosDealer.setVisibility(View.VISIBLE);
+                textPuntosJugador.setVisibility(View.VISIBLE);
+                textPuntosJugador.setText(getString(R.string.tupuntuacion)+": "+puntos);
+                buttonReplay.setVisibility(View.VISIBLE);
+                buttonCompartir.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
 
 }
 
