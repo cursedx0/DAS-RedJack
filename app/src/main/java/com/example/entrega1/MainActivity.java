@@ -1,4 +1,5 @@
 package com.example.entrega1;
+import android.Manifest;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -17,6 +18,7 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
@@ -77,8 +79,6 @@ public class MainActivity extends BaseActivity {
 
         //LinearLayoutManager elLayoutLineal= new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
         //lalista.setLayoutManager(elLayoutLineal);
-
-
 
         View button = findViewById(R.id.buttonEntrar);
         button.setOnClickListener(new View.OnClickListener() {

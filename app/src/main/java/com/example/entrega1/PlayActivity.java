@@ -603,6 +603,12 @@ public class PlayActivity extends BaseActivity {
                 startActivity(intent); //no se le pasas nada porque el nombre del archivo está en baseActivity
                 break;
             }
+            case R.id.casinos:{
+                Intent intent = new Intent(PlayActivity.this, MapActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                startActivity(intent);
+                break;
+            }
         }
         return super.onOptionsItemSelected(item);
     }

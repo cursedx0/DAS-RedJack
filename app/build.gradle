@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.android.application)
+    id 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
 }
 
 android {
@@ -39,4 +40,35 @@ dependencies {
     androidTestImplementation libs.espresso.core
     implementation libs.preference
     implementation libs.work.runtime
+    implementation libs.gms.play.services.maps
+    implementation (libs.osmdroid.android){
+        exclude group: 'com.j256.ormlite', module: 'ormlite-core'
+    }
+    implementation (libs.osmdroid.wms){
+        exclude group: 'com.j256.ormlite', module: 'ormlite-core'
+    }
+    implementation (libs.osmdroid.mapsforge){
+        exclude group: 'com.j256.ormlite', module: 'ormlite-core'
+    }
+    implementation (libs.osmdroid.geopackage) {
+        exclude group: 'com.j256.ormlite', module: 'ormlite-core'
+    }
+    implementation (libs.json.simple) {//para jsons de llamadas http
+        exclude group: 'junit', module: 'junit'}
+
+    implementation libs.play.services.location
+}
+
+secrets {
+// Optionally specify a different file name containing your secrets.
+// The plugin defaults to "local.properties"
+    propertiesFileName = "secrets.properties"
+// A properties file containing default secret values. This file can be
+// checked in version control.
+    defaultPropertiesFileName = "local.defaults.properties"
+// Configure which keys should be ignored by the plugin by providing regular expressions.
+// "sdk.dir" is ignored by default.
+    ignoreList.add("keyToIgnore") // Ignore the key "keyToIgnore"
+    ignoreList.add("sdk.*") // Ignore all keys matching the regexp
+    "sdk.*"
 }

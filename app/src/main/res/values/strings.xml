@@ -66,4 +66,9 @@
     <string name="noHistorial">No hay historial disponible.</string>
     <string name="bienvenido">Bienvenido de nuevo</string>
     <string name="loginExitoso">Has iniciado sesión con éxito.</string>
+    <string name="casinosCerca">Casinos cerca</string>
+    <string name="casino" translatable="false">Casino</string>
+    <string name="preguntameOtraVez">Pregúntame otra vez</string>
+    <string name="requierePermisosUbi">El mapa requiere permisos de ubicación.</string>
+    <string name="ajustes">Ajustes</string>
 </resources>
