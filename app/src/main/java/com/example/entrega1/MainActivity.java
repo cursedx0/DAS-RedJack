@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -81,6 +82,8 @@ public class MainActivity extends BaseActivity {
         //lalista.setLayoutManager(elLayoutLineal);
 
         View button = findViewById(R.id.buttonEntrar);
+        Button buttonReg = findViewById(R.id.buttonReg);
+
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -142,6 +145,15 @@ public class MainActivity extends BaseActivity {
                     ipw.setText("");
                 }
                 c.close();
+            }
+        });
+
+        buttonReg.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent2 = new Intent(MainActivity.this, RegisterActivity.class);
+                intent2.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                startActivity(intent2);
             }
         });
 

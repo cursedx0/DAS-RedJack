@@ -68,4 +68,11 @@
     <string name="preguntameOtraVez">Pregúntame otra vez</string>
     <string name="requierePermisosUbi">El mapa requeire permisos de ubicación.</string>
     <string name="ajustes">Ajustes</string>
+    <string name="registrarse">Registrarse</string>
+    <string name="usuarioCreado">El usuario ha sido creado con éxito.</string>
+    <string name="usuarioExiste">El nombre de usuario introducido ya está en uso.</string>
+    <string name="usuarioError">Error al crear el usuario.</string>
+    <string name="masCampos">Rellena todos los campos.</string>
+    <string name="sinCuenta">¿No tienes cuenta?</string>
+    <string name="iniciarSesion">Iniciar sesión</string>
 </resources>

@@ -68,4 +68,11 @@
     <string name="preguntameOtraVez">Ask me again</string>
     <string name="requierePermisosUbi">Map requires location permissions.</string>
     <string name="ajustes">Settings</string>
+    <string name="registrarse">Register</string>
+    <string name="usuarioCreado">User has been created successfully.</string>
+    <string name="usuarioExiste">This username is already in use.</string>
+    <string name="usuarioError">An error ocurred while creating the user.</string>
+    <string name="masCampos">Fill all the fields.</string>
+    <string name="sinCuenta">No account?</string>
+    <string name="iniciarSesion">Login</string>
 </resources>
