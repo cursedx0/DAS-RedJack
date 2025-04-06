@@ -75,4 +75,5 @@
     <string name="masCampos">Rellena todos los campos.</string>
     <string name="sinCuenta">¿No tienes cuenta?</string>
     <string name="iniciarSesion">Iniciar sesión</string>
+    <string name="loginError">Ha habido un error en el inicio de sesión.</string>
 </resources>

@@ -63,7 +63,7 @@ public class RegisterActivity extends BaseActivity {
 
                     WorkManager.getInstance(RegisterActivity.this).enqueue(request);
 
-                    //escuchar resultado Todo
+                    //escuchar resultado
                     WorkManager.getInstance(getApplicationContext())
                             .getWorkInfoByIdLiveData(request.getId())
                             .observe(RegisterActivity.this, workInfo -> {

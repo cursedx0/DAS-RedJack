@@ -27,7 +27,9 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.work.Data;
 import androidx.work.ExistingPeriodicWorkPolicy;
+import androidx.work.OneTimeWorkRequest;
 import androidx.work.PeriodicWorkRequest;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
@@ -92,7 +94,7 @@ public class MainActivity extends BaseActivity {
                 EditText ipw = findViewById(R.id.inputPw);
                 String pw = ipw.getText().toString();
 
-                Cursor c = bd.rawQuery("SELECT * FROM Usuarios WHERE Nombre=? AND Pw=?", new String[]{user, pw});
+                /*Cursor c = bd.rawQuery("SELECT * FROM Usuarios WHERE Nombre=? AND Pw=?", new String[]{user, pw});
                 if (c.getCount()==1 && c.moveToFirst()){
                     int userid = c.getInt(0);
                     int usercoins = c.getInt(3);
@@ -144,7 +146,60 @@ public class MainActivity extends BaseActivity {
                     iuser.setText(""); //evita overflow de peticiones
                     ipw.setText("");
                 }
-                c.close();
+                c.close();*/
+
+
+
+                Data datos = new Data.Builder()
+                        .putString("accion", "login")
+                        .putString("usuario", user)
+                        .putString("pw", pw)
+                        .build();
+
+                OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(conexionBDWebService.class)
+                        .setInputData(datos)
+                        .build();
+
+                WorkManager.getInstance(MainActivity.this).enqueue(request);
+
+                //escuchar resultado
+                WorkManager.getInstance(getApplicationContext())
+                        .getWorkInfoByIdLiveData(request.getId())
+                        .observe(MainActivity.this, workInfo -> {
+                            if (workInfo != null && workInfo.getState().isFinished()) {
+                                if (workInfo.getState() == WorkInfo.State.SUCCEEDED) {
+                                    String mensaje = workInfo.getOutputData().getString("message");
+                                    Log.d("WORKER", "¡200! " + mensaje);
+                                    String code = workInfo.getOutputData().getString("code");
+                                    if(code.equals("0")){
+                                        //exito
+                                        Toast.makeText(getApplicationContext(), getString(R.string.loginExitoso), Toast.LENGTH_SHORT).show();
+                                        int id = workInfo.getOutputData().getInt("id",0);
+                                        String nombre = workInfo.getOutputData().getString("nombre");
+                                        int monedas = workInfo.getOutputData().getInt("monedas",0);
+
+                                        Intent intent = new Intent(MainActivity.this, PlayActivity.class);
+                                        intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                                        intent.putExtra("id", id);
+                                        intent.putExtra("name", nombre);
+                                        intent.putExtra("coins", monedas);
+
+                                        startActivity(intent);
+
+                                    }else if(code.equals("2")){
+                                        //bad credentials
+                                        Toast.makeText(getApplicationContext(), getString(R.string.loginincorrecto), Toast.LENGTH_SHORT).show();
+                                    }else{
+                                        Toast.makeText(getApplicationContext(), getString(R.string.loginError   ), Toast.LENGTH_SHORT).show();
+                                    }
+                                    iuser.setText("");
+                                    ipw.setText(""); //para evitar demasiadas solicitudes
+                                } else {
+                                    Log.e("WORKER", "Algo falló.");
+                                }
+                            }
+                        });
+
             }
         });
 

@@ -129,6 +129,7 @@ public class PlayActivity extends BaseActivity {
         rvadapterJugador = new ElAdaptadorRecycler(miBaraja.getManoJugador());
         rvadapterDealer = new ElAdaptadorRecycler(miBaraja.getManoDealer());
 
+        //TODO cambiar petición de bd local a remota (requiere cambios en worker y php también)
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             //saldo = extras.getInt("coins");
