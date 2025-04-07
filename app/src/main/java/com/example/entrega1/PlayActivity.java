@@ -38,6 +38,10 @@ import androidx.fragment.app.FragmentContainer;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.work.Data;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -135,12 +139,50 @@ public class PlayActivity extends BaseActivity {
             //saldo = extras.getInt("coins");
             id = extras.getInt("id");
             nombre = extras.getString("name");
-            Cursor c = bd.rawQuery("SELECT * FROM Usuarios WHERE Id=?", new String[]{id+""}); //peticion extra para volver a pedir coins en caso de rotar pantalla
+             /*Cursor c = bd.rawQuery("SELECT * FROM Usuarios WHERE Id=?", new String[]{id+""}); //peticion extra para volver a pedir coins en caso de rotar pantalla
             if (c.getCount()==1 && c.moveToFirst()) {
                 saldo = c.getInt(3);
             }else{
                 saldo = 0;
+            }*/
+
+            if(!nombre.isEmpty()) {
+                Data datos = new Data.Builder()
+                        .putString("url","1") //url a php gestor de monedas
+                        .putString("accion", "monedas") //obtiene monedas de usuario
+                        .putString("usuario", nombre)
+                        .build();
+
+                OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(conexionBDWebService.class)
+                        .setInputData(datos)
+                        .build();
+
+                WorkManager.getInstance(PlayActivity.this).enqueue(request);
+
+                //escuchar resultado
+                WorkManager.getInstance(getApplicationContext())
+                        .getWorkInfoByIdLiveData(request.getId())
+                        .observe(PlayActivity.this, workInfo -> {
+                            if (workInfo != null && workInfo.getState().isFinished()) {
+                                if (workInfo.getState() == WorkInfo.State.SUCCEEDED) {
+                                    String mensaje = workInfo.getOutputData().getString("message");
+                                    Log.d("WORKER", "¡200! " + mensaje);
+                                    String code = workInfo.getOutputData().getString("code");
+                                    if(code.equals("0")){
+                                        saldo = workInfo.getOutputData().getInt("monedas",0);
+                                        tusaldo.setText(getString(R.string.tusaldo)+": "+saldo);
+                                    }else{
+                                        Toast.makeText(getApplicationContext(), getString(R.string.loginError), Toast.LENGTH_SHORT).show();
+                                    }
+                                } else {
+                                    Log.e("WORKER", "Algo falló.");
+                                }
+                            }
+                        });
+            }else{
+                Toast.makeText(getApplicationContext(), getString(R.string.masCampos), Toast.LENGTH_SHORT).show();
             }
+
         }else{
             saldo = 0;
             //si esto ocurre, el programa está condenado a fallar de todas formas
@@ -262,9 +304,12 @@ public class PlayActivity extends BaseActivity {
 
         // 1. SE RESTA LA APUESTA DEL SALDO
         saldo = saldo - apuesta;
-        ContentValues modificacion = new ContentValues();
+        /*ContentValues modificacion = new ContentValues();
         modificacion.put("Coins",Integer.toString(saldo));
-        bd.update("Usuarios", modificacion, "Id=?",new String[]{Integer.toString(id)});
+        bd.update("Usuarios", modificacion, "Id=?",new String[]{Integer.toString(id)});*/
+
+        sumaRestaSaldoBD("restar", apuesta, id);
+
         // 2. IU Y SE REPARTEN CARTAS
         buttonApostar.setVisibility(View.INVISIBLE);
 
@@ -441,9 +486,11 @@ public class PlayActivity extends BaseActivity {
         }
         //dar dinero
         tusaldo.setText(getString(R.string.tusaldo)+": "+saldo);
-        ContentValues modificacion = new ContentValues();
+        /*ContentValues modificacion = new ContentValues();
         modificacion.put("Coins",Integer.toString(saldo));
-        bd.update("Usuarios", modificacion, "Id=?",new String[]{Integer.toString(id)});
+        bd.update("Usuarios", modificacion, "Id=?",new String[]{Integer.toString(id)});*/
+
+        sumaRestaSaldoBD("sumar", apuesta*2, id);
 
         verificarArchivo();
         guardarPartida(formatearResultado(saldo,apuesta,puntos,posiblesdealer,getString(R.string.hasganado)));
@@ -457,9 +504,12 @@ public class PlayActivity extends BaseActivity {
             endDialog.show(getSupportFragmentManager(), "draw_dialog");
         }
         tusaldo.setText(getString(R.string.tusaldo)+": "+saldo);
-        ContentValues modificacion = new ContentValues();
+        /*ContentValues modificacion = new ContentValues();
         modificacion.put("Coins",Integer.toString(saldo));
-        bd.update("Usuarios", modificacion, "Id=?",new String[]{Integer.toString(id)});
+        bd.update("Usuarios", modificacion, "Id=?",new String[]{Integer.toString(id)});*/
+
+        //reembolso
+        sumaRestaSaldoBD("sumar", apuesta, id);
 
         verificarArchivo();
         guardarPartida(formatearResultado(saldo,apuesta,puntos,posiblesdealer,getString(R.string.empate)));
@@ -614,6 +664,48 @@ public class PlayActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    public void sumaRestaSaldoBD(String op, int monedas, int id){ //operacion, monedas a sumar/restar, id usuario
+        int monedasahora = -1;
+        if(id>0) {
+            Data datos = new Data.Builder()
+                    .putString("url","1") //url a php gestor de monedas
+                    .putString("accion", op) //obtiene monedas de usuario
+                    .putInt("id", id)
+                    .putInt("monedas",monedas)
+                    .build();
+
+            OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(conexionBDWebService.class)
+                    .setInputData(datos)
+                    .build();
+
+            WorkManager.getInstance(PlayActivity.this).enqueue(request);
+
+            //escuchar resultado
+            WorkManager.getInstance(getApplicationContext())
+                    .getWorkInfoByIdLiveData(request.getId())
+                    .observe(PlayActivity.this, workInfo -> {
+                        if (workInfo != null && workInfo.getState().isFinished()) {
+                            if (workInfo.getState() == WorkInfo.State.SUCCEEDED) {
+                                String mensaje = workInfo.getOutputData().getString("message");
+                                Log.d("WORKER", "¡200! " + mensaje);
+                                String code = workInfo.getOutputData().getString("code");
+                                if(code.equals("0")) {
+                                    Log.d("DATABASE", "SALDO MODIFICADO");
+                                }else{
+                                    saldo = 0;
+                                    tusaldo.setText(getString(R.string.tusaldo) + ": " + saldo);
+                                }
+                            } else {
+                                Log.e("WORKER", "Algo falló.");
+                            }
+                        }
+                    });
+
+        }else{
+            Toast.makeText(getApplicationContext(), getString(R.string.masCampos), Toast.LENGTH_SHORT).show();
+        }
+    }
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -623,6 +715,7 @@ public class PlayActivity extends BaseActivity {
         outState.putInt("apuesta",apuesta);
         outState.putInt("saldo",saldo);
         outState.putInt("id",id);
+        outState.putString("nombre", nombre);
         outState.putIntArray("posiblespuntos", posiblespuntos);
         outState.putIntArray("posiblesdealer", posiblesdealer);
         outState.putStringArrayList("mazo", new ArrayList<String>(miBaraja.getMazo()));
@@ -642,6 +735,7 @@ public class PlayActivity extends BaseActivity {
 
         // Restaurar valores guardados
         id = savedInstanceState.getInt("id");
+        nombre = savedInstanceState.getString("nombre");
         saldo = savedInstanceState.getInt("saldo");
         apuesta = savedInstanceState.getInt("apuesta");
         puntos = savedInstanceState.getInt("puntos");

@@ -34,7 +34,14 @@ public class conexionBDWebService extends Worker {
         //--PARÁMETROS--\\
         String direccion = "";
         if(getInputData().getString("url")!=null){
-            direccion = getInputData().getString("url");
+            if(getInputData().getString("url").equals("0")){
+                Log.d("WORKER", "Usando url por defecto.");
+                direccion = "http://51.44.167.78:80/lbilbao040/WEB/api.php"; //POR DEFECTO
+            }else if(getInputData().getString("url").equals("1")){
+                direccion = "http://51.44.167.78:80/lbilbao040/WEB/monedas.php"; //monedas
+            }else {
+                direccion = getInputData().getString("url");
+            }
         }else{
             Log.d("WORKER", "Usando url por defecto.");
             direccion = "http://51.44.167.78:80/lbilbao040/WEB/api.php"; //POR DEFECTO
@@ -192,9 +199,225 @@ public class conexionBDWebService extends Worker {
                                 .putString("code", "-1")
                                 .build());
                     } //break
-                case "bu": //borrar usuario
+                case "eliminar": //borrar usuario
                     //POST
                     break;
+                case "monedas":
+                    HttpURLConnection urlConnectionMonedas = null;
+                    URL destinoMonedas = null;
+                    try {
+                        destinoMonedas = new URL(direccion);
+                        urlConnectionMonedas = (HttpURLConnection) destinoMonedas.openConnection();
+                        urlConnectionMonedas.setConnectTimeout(5000);
+                        urlConnectionMonedas.setReadTimeout(5000);
+                        urlConnectionMonedas.setRequestMethod("POST");
+                        urlConnectionMonedas.setDoOutput(true);
+                        urlConnectionMonedas.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+
+                        // Crear JSON con los parámetros
+                        JSONObject jsonParam = new JSONObject();
+                        jsonParam.put("accion", accion);
+
+                        if(getInputData().getString("usuario")!=null){
+                            Log.d("WORKER", "00000000000000000000000000000000000000000");
+                            jsonParam.put("usuario", getInputData().getString("usuario"));
+                            paramsValidos = true;
+                        }
+
+                        Log.d("WORKER", "JSON definido");
+                        Log.d("WORKER", "JSON a enviar: " + jsonParam.toString());
+                        if (paramsValidos) {
+                            // Escribir el JSON en el cuerpo de la solicitud
+                            OutputStream os = urlConnectionMonedas.getOutputStream();
+                            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                            writer.write(jsonParam.toString());
+                            writer.flush();
+                            writer.close();
+                            os.close();
+
+                            // Enviar la solicitud y recibir la respuesta
+                            int responseCode = urlConnectionMonedas.getResponseCode();
+                            if (responseCode == HttpURLConnection.HTTP_OK) {
+                                BufferedReader br = new BufferedReader(new InputStreamReader(urlConnectionMonedas.getInputStream(), StandardCharsets.UTF_8));
+                                StringBuilder response = new StringBuilder();
+                                String line;
+                                while ((line = br.readLine()) != null) {
+                                    response.append(line);
+                                }
+                                br.close();
+
+                                // Parsear respuesta JSON
+                                JSONObject respuestaJson = new JSONObject(response.toString());
+                                String mensaje = respuestaJson.optString("message", "Sin mensaje");
+                                String codigo = respuestaJson.optString("code", "-1");
+                                String nombre = respuestaJson.optString("nombre", "error");
+                                int monedas = respuestaJson.optInt("monedas", 0);
+
+                                Log.d("RESPUESTA", response.toString()); // Imprimir respuesta del servidor
+                                return Result.success(new Data.Builder()
+                                        .putString("message", mensaje)
+                                        .putString("code", codigo)
+                                        .putString("nombre", nombre)
+                                        .putInt("monedas", monedas)
+                                        .build());
+                            } else {
+                                Log.e("ERROR", "Error en la solicitud: " + responseCode);
+                                return Result.failure();
+                            }
+                        }else{
+                            return Result.failure();
+                        }
+                    } catch (IOException | JSONException e) {
+                        Log.e("WORKER", "Excepción en doWork: " + e.getMessage(), e);
+                        return Result.failure(new Data.Builder()
+                                .putString("message", "Excepción: " + e.getMessage())
+                                .putString("code", "-1")
+                                .build());
+                    } //break
+                case "sumar":
+                    HttpURLConnection urlConnectionSumar = null;
+                    URL destinoSumar = null;
+                    try {
+                        destinoSumar = new URL(direccion);
+                        urlConnectionSumar = (HttpURLConnection) destinoSumar.openConnection();
+                        urlConnectionSumar.setConnectTimeout(5000);
+                        urlConnectionSumar.setReadTimeout(5000);
+                        urlConnectionSumar.setRequestMethod("POST");
+                        urlConnectionSumar.setDoOutput(true);
+                        urlConnectionSumar.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+
+                        // Crear JSON con los parámetros
+                        JSONObject jsonParam = new JSONObject();
+                        jsonParam.put("accion", accion);
+
+                        if(getInputData().getInt("id",0)!=0 && getInputData().getInt("monedas",0)!=0){
+                            jsonParam.put("id", getInputData().getInt("id",0));
+                            jsonParam.put("monedas", getInputData().getInt("monedas",0));
+                            paramsValidos = true;
+                        }
+
+                        Log.d("WORKER", "JSON definido");
+                        Log.d("WORKER", "JSON a enviar: " + jsonParam.toString());
+                        if (paramsValidos) {
+                            // Escribir el JSON en el cuerpo de la solicitud
+                            OutputStream os = urlConnectionSumar.getOutputStream();
+                            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                            writer.write(jsonParam.toString());
+                            writer.flush();
+                            writer.close();
+                            os.close();
+
+                            // Enviar la solicitud y recibir la respuesta
+                            int responseCode = urlConnectionSumar.getResponseCode();
+                            if (responseCode == HttpURLConnection.HTTP_OK) {
+                                BufferedReader br = new BufferedReader(new InputStreamReader(urlConnectionSumar.getInputStream(), StandardCharsets.UTF_8));
+                                StringBuilder response = new StringBuilder();
+                                String line;
+                                while ((line = br.readLine()) != null) {
+                                    response.append(line);
+                                }
+                                br.close();
+
+                                // Parsear respuesta JSON
+                                JSONObject respuestaJson = new JSONObject(response.toString());
+                                String mensaje = respuestaJson.optString("message", "Sin mensaje");
+                                String codigo = respuestaJson.optString("code", "-1");
+                                int id = respuestaJson.optInt("id", 0);
+                                int monedas = respuestaJson.optInt("monedas", 0);
+
+                                Log.d("RESPUESTA", response.toString()); // Imprimir respuesta del servidor
+                                return Result.success(new Data.Builder()
+                                        .putString("message", mensaje)
+                                        .putString("code", codigo)
+                                        .putInt("id", id)
+                                        .putInt("monedas", monedas)
+                                        .build());
+                            } else {
+                                Log.e("ERROR", "Error en la solicitud: " + responseCode);
+                                return Result.failure();
+                            }
+                        }else{
+                            return Result.failure();
+                        }
+                    } catch (IOException | JSONException e) {
+                        Log.e("WORKER", "Excepción en doWork: " + e.getMessage(), e);
+                        return Result.failure(new Data.Builder()
+                                .putString("message", "Excepción: " + e.getMessage())
+                                .putString("code", "-1")
+                                .build());
+                    } //break
+                case "restar":
+                    HttpURLConnection urlConnectionRestar = null;
+                    URL destinoRestar = null;
+                    try {
+                        destinoRestar = new URL(direccion);
+                        urlConnectionRestar = (HttpURLConnection) destinoRestar.openConnection();
+                        urlConnectionRestar.setConnectTimeout(5000);
+                        urlConnectionRestar.setReadTimeout(5000);
+                        urlConnectionRestar.setRequestMethod("POST");
+                        urlConnectionRestar.setDoOutput(true);
+                        urlConnectionRestar.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+
+                        // Crear JSON con los parámetros
+                        JSONObject jsonParam = new JSONObject();
+                        jsonParam.put("accion", accion);
+
+                        if(getInputData().getInt("id",0)!=0 && getInputData().getInt("monedas",0)!=0){
+                            jsonParam.put("id", getInputData().getInt("id",0));
+                            jsonParam.put("monedas", getInputData().getInt("monedas",0));
+                            paramsValidos = true;
+                        }
+
+                        Log.d("WORKER", "JSON definido");
+                        Log.d("WORKER", "JSON a enviar: " + jsonParam.toString());
+                        if (paramsValidos) {
+                            // Escribir el JSON en el cuerpo de la solicitud
+                            OutputStream os = urlConnectionRestar.getOutputStream();
+                            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                            writer.write(jsonParam.toString());
+                            writer.flush();
+                            writer.close();
+                            os.close();
+
+                            // Enviar la solicitud y recibir la respuesta
+                            int responseCode = urlConnectionRestar.getResponseCode();
+                            if (responseCode == HttpURLConnection.HTTP_OK) {
+                                BufferedReader br = new BufferedReader(new InputStreamReader(urlConnectionRestar.getInputStream(), StandardCharsets.UTF_8));
+                                StringBuilder response = new StringBuilder();
+                                String line;
+                                while ((line = br.readLine()) != null) {
+                                    response.append(line);
+                                }
+                                br.close();
+
+                                // Parsear respuesta JSON
+                                JSONObject respuestaJson = new JSONObject(response.toString());
+                                String mensaje = respuestaJson.optString("message", "Sin mensaje");
+                                String codigo = respuestaJson.optString("code", "-1");
+                                int id = respuestaJson.optInt("id", 0);
+                                int monedas = respuestaJson.optInt("monedas", 0);
+
+                                Log.d("RESPUESTA", response.toString()); // Imprimir respuesta del servidor
+                                return Result.success(new Data.Builder()
+                                        .putString("message", mensaje)
+                                        .putString("code", codigo)
+                                        .putInt("id", id)
+                                        .putInt("monedas", monedas)
+                                        .build());
+                            } else {
+                                Log.e("ERROR", "Error en la solicitud: " + responseCode);
+                                return Result.failure();
+                            }
+                        }else{
+                            return Result.failure();
+                        }
+                    } catch (IOException | JSONException e) {
+                        Log.e("WORKER", "Excepción en doWork: " + e.getMessage(), e);
+                        return Result.failure(new Data.Builder()
+                                .putString("message", "Excepción: " + e.getMessage())
+                                .putString("code", "-1")
+                                .build());
+                    } //break
             }
         }
 
