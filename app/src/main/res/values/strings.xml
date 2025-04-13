@@ -79,4 +79,6 @@
     <string name="sinCuenta">¿No tienes cuenta?</string>
     <string name="iniciarSesion">Iniciar sesión</string>
     <string name="loginError">Ha habido un error en el inicio de sesión.</string>
+    <string name="perfil">Perfil</string>
+    <string name="requierePermisosCam">Esta función requiere permisos de cámara.</string>
 </resources>

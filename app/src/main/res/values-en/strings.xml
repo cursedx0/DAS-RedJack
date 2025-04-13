@@ -76,4 +76,6 @@
     <string name="sinCuenta">No account?</string>
     <string name="iniciarSesion">Login</string>
     <string name="loginError">An error ocurred while logging in.</string>
+    <string name="perfil">Profile</string>
+    <string name="requierePermisosCam">This function requires camera permissions.</string>
 </resources>

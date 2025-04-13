@@ -133,7 +133,6 @@ public class PlayActivity extends BaseActivity {
         rvadapterJugador = new ElAdaptadorRecycler(miBaraja.getManoJugador());
         rvadapterDealer = new ElAdaptadorRecycler(miBaraja.getManoDealer());
 
-        //TODO cambiar petición de bd local a remota (requiere cambios en worker y php también)
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             //saldo = extras.getInt("coins");
@@ -628,9 +627,9 @@ public class PlayActivity extends BaseActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        int id=item.getItemId();
-        switch (id){
-            case R.id.prefs:{
+        int id = item.getItemId();
+        switch (id) {
+            case R.id.prefs: {
                 Preferencias prefs = new Preferencias();
                 FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
                 findViewById(R.id.fragmentContainer).setVisibility(View.VISIBLE);
@@ -639,24 +638,33 @@ public class PlayActivity extends BaseActivity {
                 transaction.commit();
                 break;
             }
-            case R.id.logout:{
-                if(jugandoFlag){
+            case R.id.logout: {
+                if (jugandoFlag) {
                     ExitDialog exitDialog = new ExitDialog();
                     exitDialog.show(getSupportFragmentManager(), "exit_dialog2");
-                }else{
+                } else {
                     finish();
                 }
                 break;
             }
-            case R.id.hist:{
+            case R.id.hist: {
                 Intent intent = new Intent(PlayActivity.this, HistoryActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 startActivity(intent); //no se le pasas nada porque el nombre del archivo está en baseActivity
                 break;
             }
-            case R.id.casinos:{
+            case R.id.casinos: {
                 Intent intent = new Intent(PlayActivity.this, MapActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                startActivity(intent);
+                break;
+            }
+            case R.id.perfil: {
+                Intent intent = new Intent(PlayActivity.this, ProfileActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                intent.putExtra("id", this.id);
+                intent.putExtra("nombre", nombre);
+                intent.putExtra("saldo", saldo);
                 startActivity(intent);
                 break;
             }

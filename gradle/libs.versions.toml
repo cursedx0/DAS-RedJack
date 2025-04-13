@@ -1,5 +1,6 @@
 [versions]
 agp = "8.8.0"
+glide = "4.16.0"
 jsonSimple = "1.1.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -15,6 +16,8 @@ preference = "1.2.1"
 workRuntime = "2.10.0"
 
 [libraries]
+compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "glide" }
+glide = { module = "com.github.bumptech.glide:glide", version.ref = "glide" }
 gms-play-services-maps = { module = "com.google.android.gms:play-services-maps", version.ref = "playServicesMapsVersion" }
 json-simple = { module = "com.googlecode.json-simple:json-simple", version.ref = "jsonSimple" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }

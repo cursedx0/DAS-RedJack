@@ -1,6 +1,9 @@
 package com.example.entrega1;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -10,6 +13,8 @@ import androidx.work.WorkerParameters;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -39,6 +44,8 @@ public class conexionBDWebService extends Worker {
                 direccion = "http://51.44.167.78:80/lbilbao040/WEB/api.php"; //POR DEFECTO
             }else if(getInputData().getString("url").equals("1")){
                 direccion = "http://51.44.167.78:80/lbilbao040/WEB/monedas.php"; //monedas
+            }else if(getInputData().getString("url").equals("2")){
+                direccion = "http://51.44.167.78:80/lbilbao040/WEB/pfp.php"; //monedas
             }else {
                 direccion = getInputData().getString("url");
             }
@@ -219,7 +226,6 @@ public class conexionBDWebService extends Worker {
                         jsonParam.put("accion", accion);
 
                         if(getInputData().getString("usuario")!=null){
-                            Log.d("WORKER", "00000000000000000000000000000000000000000");
                             jsonParam.put("usuario", getInputData().getString("usuario"));
                             paramsValidos = true;
                         }
@@ -403,6 +409,160 @@ public class conexionBDWebService extends Worker {
                                         .putString("code", codigo)
                                         .putInt("id", id)
                                         .putInt("monedas", monedas)
+                                        .build());
+                            } else {
+                                Log.e("ERROR", "Error en la solicitud: " + responseCode);
+                                return Result.failure();
+                            }
+                        }else{
+                            return Result.failure();
+                        }
+                    } catch (IOException | JSONException e) {
+                        Log.e("WORKER", "Excepción en doWork: " + e.getMessage(), e);
+                        return Result.failure(new Data.Builder()
+                                .putString("message", "Excepción: " + e.getMessage())
+                                .putString("code", "-1")
+                                .build());
+                    } //break
+                case "setpfp":
+                    HttpURLConnection urlConnectionSetPfp = null;
+                    URL destinoSetPfp = null;
+                    try {
+                        destinoSetPfp = new URL(direccion);
+                        urlConnectionSetPfp = (HttpURLConnection) destinoSetPfp.openConnection();
+                        urlConnectionSetPfp.setConnectTimeout(5000);
+                        urlConnectionSetPfp.setReadTimeout(5000);
+                        urlConnectionSetPfp.setRequestMethod("POST");
+                        urlConnectionSetPfp.setDoOutput(true);
+                        urlConnectionSetPfp.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+
+                        // Crear JSON con los parámetros
+                        JSONObject jsonParam = new JSONObject();
+                        jsonParam.put("accion", accion);
+
+                        if(getInputData().getInt("id",0)!=0 && getInputData().getString("pic")!=null){
+                            String imagePath = getInputData().getString("pic");
+                            File imageFile = new File(imagePath);
+                            Log.d("WORKER","11111111111111");
+                            if (imageFile.exists()) {
+                                Bitmap bitmap = BitmapFactory.decodeFile(imageFile.getAbsolutePath());
+                                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                                bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                                byte[] imageBytes = stream.toByteArray();
+                                Log.d("WORKER","22222222222222");
+                                String base64Image = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+                                Log.d("WORKER","3333333333333");
+                                jsonParam.put("id", getInputData().getInt("id", 0));
+                                jsonParam.put("pic", base64Image);
+                                paramsValidos = true;
+                                Log.d("WORKER","4444444444444");
+                            }
+                        }
+
+                        Log.d("WORKER", "JSON definido");
+                        Log.d("WORKER", "JSON a enviar: " + jsonParam.toString());
+                        if (paramsValidos) {
+                            // Escribir el JSON en el cuerpo de la solicitud
+                            OutputStream os = urlConnectionSetPfp.getOutputStream();
+                            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                            writer.write(jsonParam.toString());
+                            writer.flush();
+                            writer.close();
+                            os.close();
+
+                            // Enviar la solicitud y recibir la respuesta
+                            int responseCode = urlConnectionSetPfp.getResponseCode();
+                            if (responseCode == HttpURLConnection.HTTP_OK) {
+                                BufferedReader br = new BufferedReader(new InputStreamReader(urlConnectionSetPfp.getInputStream(), StandardCharsets.UTF_8));
+                                StringBuilder response = new StringBuilder();
+                                String line;
+                                while ((line = br.readLine()) != null) {
+                                    response.append(line);
+                                }
+                                br.close();
+
+                                // Parsear respuesta JSON
+                                JSONObject respuestaJson = new JSONObject(response.toString());
+                                String mensaje = respuestaJson.optString("message", "Sin mensaje");
+                                String codigo = respuestaJson.optString("code", "-1");
+                                int id = respuestaJson.optInt("id", 0);
+
+                                Log.d("RESPUESTA", response.toString()); // Imprimir respuesta del servidor
+                                return Result.success(new Data.Builder()
+                                        .putString("message", mensaje)
+                                        .putString("code", codigo)
+                                        .build());
+                            } else {
+                                Log.e("ERROR", "Error en la solicitud: " + responseCode);
+                                return Result.failure();
+                            }
+                        }else{
+                            return Result.failure();
+                        }
+                    } catch (IOException | JSONException e) {
+                        Log.e("WORKER", "Excepción en doWork: " + e.getMessage(), e);
+                        return Result.failure(new Data.Builder()
+                                .putString("message", "Excepción: " + e.getMessage())
+                                .putString("code", "-1")
+                                .build());
+                    } //break
+                case "getpfp":
+                    HttpURLConnection urlConnectionGetPfp = null;
+                    URL destinoGetPfp = null;
+                    try {
+                        destinoGetPfp = new URL(direccion);
+                        urlConnectionGetPfp = (HttpURLConnection) destinoGetPfp.openConnection();
+                        urlConnectionGetPfp.setConnectTimeout(5000);
+                        urlConnectionGetPfp.setReadTimeout(5000);
+                        urlConnectionGetPfp.setRequestMethod("POST");
+                        urlConnectionGetPfp.setDoOutput(true);
+                        urlConnectionGetPfp.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+
+                        // Crear JSON con los parámetros
+                        JSONObject jsonParam = new JSONObject();
+                        jsonParam.put("accion", accion);
+
+                        if(getInputData().getString("nombre")!=null){
+                            jsonParam.put("nombre", getInputData().getString("nombre"));
+                            paramsValidos = true;
+                        }
+
+                        Log.d("WORKER", "JSON definido");
+                        Log.d("WORKER", "JSON a enviar: " + jsonParam.toString());
+                        if (paramsValidos) {
+                            // Escribir el JSON en el cuerpo de la solicitud
+                            OutputStream os = urlConnectionGetPfp.getOutputStream();
+                            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                            writer.write(jsonParam.toString());
+                            writer.flush();
+                            writer.close();
+                            os.close();
+
+                            // Enviar la solicitud y recibir la respuesta
+                            int responseCode = urlConnectionGetPfp.getResponseCode();
+                            if (responseCode == HttpURLConnection.HTTP_OK) {
+                                BufferedReader br = new BufferedReader(new InputStreamReader(urlConnectionGetPfp.getInputStream(), StandardCharsets.UTF_8));
+                                StringBuilder response = new StringBuilder();
+                                String line;
+                                while ((line = br.readLine()) != null) {
+                                    response.append(line);
+                                }
+                                br.close();
+
+                                // Parsear respuesta JSON
+                                JSONObject respuestaJson = new JSONObject(response.toString());
+                                String mensaje = respuestaJson.optString("message", "Sin mensaje");
+                                String codigo = respuestaJson.optString("code", "-1");
+                                String imagen = respuestaJson.optString("imagen",null);
+                                String url = respuestaJson.optString("url","Sin url.");
+                                int id = respuestaJson.optInt("id", 0);
+
+                                Log.d("RESPUESTA", response.toString()); // Imprimir respuesta del servidor
+                                return Result.success(new Data.Builder()
+                                        .putString("message", mensaje)
+                                        .putString("code", codigo)
+                                        //.putString("imagen",imagen) //evitado por problemas de overflow
+                                        .putString("url", url)
                                         .build());
                             } else {
                                 Log.e("ERROR", "Error en la solicitud: " + responseCode);
