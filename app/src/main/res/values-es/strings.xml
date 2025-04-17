@@ -78,4 +78,15 @@
     <string name="loginError">Ha habido un error en el inicio de sesión.</string>
     <string name="perfil">Perfil</string>
     <string name="requierePermisosCam">Esta función requiere permisos de cámara.</string>
+    <string name="kmsRedonda">kms a la redonda</string>
+    <string name="juegaRedJack">¡Juega RedJack!</string>
+    <string name="dealerTriste">El dealer te echa de menos.</string>
+    <string name="barajaCaliente">La baraja está caliente...</string>
+    <string name="victorias">Victorias</string>
+    <string name="derrotas">Derrotas</string>
+    <string name="empates">Empates</string>
+    <string name="partidasJugadas">Manos jugadas</string>
+    <string name="estatus">Estatus</string>
+    <string name="monedas">Monedas</string>
+    <string name="cargando">Cargando</string>
 </resources>

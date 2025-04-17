@@ -1,8 +1,10 @@
 package com.example.entrega1;
 import android.Manifest;
 
+import android.app.AlarmManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -35,6 +37,7 @@ import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends BaseActivity {
@@ -50,8 +53,15 @@ public class MainActivity extends BaseActivity {
             return insets;
         });
 
-        miBD GestorDB = new miBD(this,"miBD",null,1);
-        SQLiteDatabase bd = GestorDB.getWritableDatabase();
+        /*miBD GestorDB = new miBD(this,"miBD",null,1);
+        SQLiteDatabase bd = GestorDB.getWritableDatabase();*/
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+                    != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1);
+            }
+        }
 
         /*
         ContentValues nuevo = new ContentValues();
@@ -211,6 +221,42 @@ public class MainActivity extends BaseActivity {
                 startActivity(intent2);
             }
         });
-
     }
+
+    @Override
+    protected void onStop() {//programa la alarma al abandonar la aplicación
+        super.onStop();
+        programarNotificacionEnUnaHora();
+    }
+
+    @Override
+    protected void onStart() { //cancela la alarma al entrar a la app
+        super.onStart();
+        cancelarNotificacionProgramada();
+    }
+
+    private void programarNotificacionEnUnaHora() {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, ReminderReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                this, 0, intent, PendingIntent.FLAG_IMMUTABLE
+        );
+
+        long triggerAtMillis = System.currentTimeMillis() + 30 * 60 * 1000; //30 mins
+
+        alarmManager.set(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent);
+        Log.d("Alarma", "Notificación programada en media hora");
+    }
+
+    private void cancelarNotificacionProgramada() {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        Intent intent = new Intent(this, ReminderReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                this, 0, intent, PendingIntent.FLAG_IMMUTABLE
+        );
+
+        alarmManager.cancel(pendingIntent);
+        Log.d("Alarma", "Alarmas canceladas porque el usuario volvió a la app");
+    }
+
 }

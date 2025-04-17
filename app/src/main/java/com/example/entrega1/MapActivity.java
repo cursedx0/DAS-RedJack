@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -21,6 +22,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.preference.PreferenceManager;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.osmdroid.config.Configuration;
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
@@ -29,6 +33,13 @@ import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
 
 import java.io.File;
+import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class MapActivity extends BaseActivity {
 
@@ -38,6 +49,8 @@ public class MapActivity extends BaseActivity {
     private Button buttonAsk;
     private TextView textAsk;
     private Button buttonAtras;
+    private Button buttonBuscar;
+    private EditText ikms;
     private LocationManager locationManager;
     private LocationListener locationListener;
 
@@ -63,6 +76,8 @@ public class MapActivity extends BaseActivity {
         textAsk = findViewById(R.id.textViewRequisito);
         buttonAsk = findViewById(R.id.buttonAskMe);
         buttonAtras = findViewById(R.id.buttonAtrasMap);
+        buttonBuscar = findViewById(R.id.buttonBuscar);
+        ikms = findViewById(R.id.inputKms);
         map = findViewById(R.id.map);
 
         // Configurar el mapa de OSM
@@ -87,6 +102,13 @@ public class MapActivity extends BaseActivity {
         map.getController().setZoom(10.0);
 
         requestLocationPermission();
+
+        buttonBuscar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                rutinaUbicacion();
+            }
+        });
     }
 
     private void requestLocationPermission() {
@@ -103,14 +125,9 @@ public class MapActivity extends BaseActivity {
         }
     }
 
-    private void startLocationUpdates() {
+    private void rutinaUbicacion(){ //usada al iniciar updates y al pulsar boton
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
-
-            buttonAsk.setVisibility(View.INVISIBLE);
-            textAsk.setVisibility(View.INVISIBLE);
-            map.setVisibility(View.VISIBLE);
-
             Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             if (lastKnownLocation == null) {
                 lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
@@ -120,7 +137,29 @@ public class MapActivity extends BaseActivity {
             if (lastKnownLocation != null) {
                 Log.i("UBICACIÓN", "Última ubicación conocida: " + lastKnownLocation.getLatitude() + ", " + lastKnownLocation.getLongitude());
                 updateMapLocation(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
+                if (ikms.getText() != null && !String.valueOf(ikms.getText()).isEmpty()) {
+                    if(String.valueOf(ikms.getText()).equals("0")){
+                        ikms.setText("5");
+                    }
+                    obtenerCasinos(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude(), Integer.parseInt(String.valueOf(ikms.getText())));
+                } else {
+                    obtenerCasinos(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude(), 5);
+                }
             }
+        }
+    }
+
+    private void startLocationUpdates() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+
+            buttonAsk.setVisibility(View.INVISIBLE);
+            textAsk.setVisibility(View.INVISIBLE);
+            map.setVisibility(View.VISIBLE);
+            buttonBuscar.setVisibility(View.VISIBLE);
+            ikms.setVisibility(View.VISIBLE);
+
+            rutinaUbicacion();
 
             // Definir el listener de ubicación
             locationListener = new LocationListener() {
@@ -147,7 +186,7 @@ public class MapActivity extends BaseActivity {
 
             // Centrar el mapa en la ubicación del usuario
             map.getController().setCenter(userLocation);
-            map.getController().setZoom(18.0);
+            //map.getController().setZoom(18.0); //esto puede resultar incómodo
 
             // Eliminar marcadores previos
             map.getOverlays().clear();
@@ -158,10 +197,101 @@ public class MapActivity extends BaseActivity {
             marker.setTitle("Ubicación actual");
             marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
 
+            if (ikms.getText() != null && !String.valueOf(ikms.getText()).isEmpty()) {
+                obtenerCasinos(latitude, longitude, Integer.parseInt(String.valueOf(ikms.getText())));
+            } else {
+                obtenerCasinos(latitude, longitude, 5);
+            }
+
             map.getOverlays().add(marker);
             map.invalidate();
         }
     }
+
+    private void obtenerCasinos(double latitude, double longitude, int kms) {
+        OkHttpClient client = new OkHttpClient();
+        String query;
+        if(kms==0){
+            query = "[out:json];(" +
+                    "node(around:5000," + latitude + "," + longitude + ")[\"amenity\"=\"casino\"];" +
+                    "node(around:5000," + latitude + "," + longitude + ")[\"leisure\"=\"gambling\"];" +
+                    "node(around:5000," + latitude + "," + longitude + ")[\"shop\"=\"betting\"];" +
+                    "node(around:5000," + latitude + "," + longitude + ")[\"gambling\"];" +
+                    ");out;";
+        }else{
+            query = "[out:json];(" +
+                    "node(around:"+kms+"000," + latitude + "," + longitude + ")[\"amenity\"=\"casino\"];" +
+                    "node(around:"+kms+"000," + latitude + "," + longitude + ")[\"leisure\"=\"gambling\"];" +
+                    "node(around:"+kms+"000," + latitude + "," + longitude + ")[\"shop\"=\"betting\"];" +
+                    "node(around:"+kms+"000," + latitude + "," + longitude + ")[\"gambling\"];" +
+                    ");out;";
+        }
+
+        String url = "https://overpass-api.de/api/interpreter?data=" + Uri.encode(query);
+
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+
+        client.newCall(request).enqueue(new Callback() {
+            @Override
+            public void onFailure(@NonNull Call call, @NonNull IOException e) {
+                e.printStackTrace();
+                runOnUiThread(() -> Toast.makeText(MapActivity.this, "Error al obtener casinos", Toast.LENGTH_SHORT).show());
+            }
+
+            @Override
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
+                if (!response.isSuccessful()) return;
+
+                String responseData = response.body().string();
+
+                try {
+                    JSONObject json = new JSONObject(responseData);
+                    Log.d("OVERPASS",json.toString());
+                    JSONArray elements = json.getJSONArray("elements");
+
+                    runOnUiThread(() -> {
+                        for (int i = 0; i < elements.length(); i++) {
+                            try {
+                                JSONObject element = elements.getJSONObject(i);
+                                double lat = element.getDouble("lat");
+                                double lon = element.getDouble("lon");
+
+                                String name = "Casino";
+                                if (element.has("tags")) {
+                                    JSONObject tags = element.getJSONObject("tags");
+                                    if (tags.has("name")) {
+                                        name = tags.getString("name");
+                                    }
+                                }
+
+                                marcarCasino(lat, lon, name);
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    private void marcarCasino(double lat, double lon, String title) {
+        Log.d("CASINO LOCATED","HERE");
+        GeoPoint point = new GeoPoint(lat, lon);
+        Marker marker = new Marker(map);
+        marker.setPosition(point);
+        marker.setTitle(title);
+        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+        marker.setIcon(getResources().getDrawable(R.drawable.icono_rombo)); // Usa un ícono rojo de casino
+        map.getOverlays().add(marker);
+        map.invalidate();
+    }
+
+
 
     @Override
     protected void onPause() {

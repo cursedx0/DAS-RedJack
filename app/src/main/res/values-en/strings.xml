@@ -78,4 +78,15 @@
     <string name="loginError">An error ocurred while logging in.</string>
     <string name="perfil">Profile</string>
     <string name="requierePermisosCam">This function requires camera permissions.</string>
+    <string name="kmsRedonda">kms radius</string>
+    <string name="juegaRedJack">Play RedJack!</string>
+    <string name="dealerTriste">The dealer misses you.</string>
+    <string name="barajaCaliente">The deck is hot right now...</string>
+    <string name="victorias">Wins</string>
+    <string name="derrotas">Defeats</string>
+    <string name="empates">Draws</string>
+    <string name="partidasJugadas">Played hands</string>
+    <string name="estatus">Status</string>
+    <string name="monedas">Coins</string>
+    <string name="cargando">Loading</string>
 </resources>

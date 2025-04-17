@@ -84,6 +84,13 @@ public class ProfileActivity extends BaseActivity {
         }
 
         TextView textUser = findViewById(R.id.textUser);
+        TextView iVicts = findViewById(R.id.iVicts);
+        TextView iDerrs = findViewById(R.id.iDerrs);
+        TextView iEmpts = findViewById(R.id.iEmpts);
+        TextView iManos = findViewById(R.id.iManos);
+        TextView iEstatus = findViewById(R.id.iEstatus);
+        TextView iSaldo = findViewById(R.id.iMonedas);
+
         pfp = findViewById(R.id.pfp);
         ImageButton buttonCam = findViewById(R.id.buttonCam);
         ImageButton buttonGallery = findViewById(R.id.buttonGallery);
@@ -150,6 +157,65 @@ public class ProfileActivity extends BaseActivity {
                                 }
                             } else {
                                 Log.e("WORKER", "Algo falló.");
+                            }
+                        }
+                    });
+
+        }else{
+            Toast.makeText(getApplicationContext(), getString(R.string.masCampos), Toast.LENGTH_SHORT).show();
+        }
+
+        //--OBTENER STATS--\\
+        if(!nombre.isEmpty()) {
+            Data datos = new Data.Builder()
+                    //.putString("url","1") //url a php gestor de monedas
+                    .putString("accion", "info") //obtiene monedas de usuario
+                    .putString("usuario", nombre)
+                    .build();
+
+            OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(conexionBDWebService.class)
+                    .setInputData(datos)
+                    .build();
+
+            WorkManager.getInstance(ProfileActivity.this).enqueue(request);
+
+            //escuchar resultado
+            WorkManager.getInstance(getApplicationContext())
+                    .getWorkInfoByIdLiveData(request.getId())
+                    .observe(ProfileActivity.this, workInfo -> {
+                        if (workInfo != null && workInfo.getState().isFinished()) {
+                            if (workInfo.getState() == WorkInfo.State.SUCCEEDED) {
+                                String mensaje = workInfo.getOutputData().getString("message");
+                                Log.d("WORKER", "¡200! " + mensaje);
+                                String code = workInfo.getOutputData().getString("code");
+                                if(code.equals("0")) {
+                                    /*String v = workInfo.getOutputData().getString("victs");
+                                    String d = workInfo.getOutputData().getString("derrs");
+                                    String e = workInfo.getOutputData().getString("empts");
+                                    String s = workInfo.getOutputData().getString("monedas");*/
+
+                                    int v = workInfo.getOutputData().getInt("victs",0);
+                                    int d = workInfo.getOutputData().getInt("derrs",0);
+                                    int e = workInfo.getOutputData().getInt("empts",0);
+                                    int s = workInfo.getOutputData().getInt("monedas",0);
+
+                                    Log.d("COMPROBAR", v+"");
+
+                                    iVicts.setText(v+"");
+                                    iDerrs.setText(d+"");
+                                    iEmpts.setText(e+"");
+
+                                    int m = v + d + e;
+                                    int es = s*v;
+                                    iManos.setText(m+"");
+                                    iEstatus.setText(es+"");
+                                    iSaldo.setText(s+"");
+                                }else{
+                                    //error total
+                                    Log.d("OBETENER INFO", "FALLÓ");
+                                }
+                            } else {
+                                Log.e("WORKER", "Algo falló (info).");
                             }
                         }
                     });

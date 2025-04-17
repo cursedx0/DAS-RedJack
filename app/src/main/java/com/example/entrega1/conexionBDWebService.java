@@ -209,6 +209,84 @@ public class conexionBDWebService extends Worker {
                 case "eliminar": //borrar usuario
                     //POST
                     break;
+                case "info": //verificar usuario, para inicio de sesión
+                    //POST
+                    HttpURLConnection urlConnectionInfo = null;
+                    URL destinoInfo = null;
+                    try {
+                        destinoInfo = new URL(direccion);
+                        urlConnectionLogin = (HttpURLConnection) destinoInfo.openConnection();
+                        urlConnectionLogin.setConnectTimeout(5000);
+                        urlConnectionLogin.setReadTimeout(5000);
+                        urlConnectionLogin.setRequestMethod("POST");
+                        urlConnectionLogin.setDoOutput(true);
+                        urlConnectionLogin.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
+
+                        // Crear JSON con los parámetros
+                        JSONObject jsonParam = new JSONObject();
+                        jsonParam.put("accion", accion);
+
+                        if(getInputData().getString("usuario")!=null){
+                            jsonParam.put("usuario", getInputData().getString("usuario"));
+                            paramsValidos = true;
+                        }
+
+                        Log.d("WORKER", "JSON definido");
+                        Log.d("WORKER", "JSON a enviar: " + jsonParam.toString());
+                        if (paramsValidos) {
+                            // Escribir el JSON en el cuerpo de la solicitud
+                            OutputStream os = urlConnectionLogin.getOutputStream();
+                            BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
+                            writer.write(jsonParam.toString());
+                            writer.flush();
+                            writer.close();
+                            os.close();
+
+                            // Enviar la solicitud y recibir la respuesta
+                            int responseCode = urlConnectionLogin.getResponseCode();
+                            if (responseCode == HttpURLConnection.HTTP_OK) {
+                                BufferedReader br = new BufferedReader(new InputStreamReader(urlConnectionLogin.getInputStream(), StandardCharsets.UTF_8));
+                                StringBuilder response = new StringBuilder();
+                                String line;
+                                while ((line = br.readLine()) != null) {
+                                    response.append(line);
+                                }
+                                br.close();
+
+                                // Parsear respuesta JSON
+                                JSONObject respuestaJson = new JSONObject(response.toString());
+                                String mensaje = respuestaJson.optString("message", "Sin mensaje");
+                                String codigo = respuestaJson.optString("code", "-1");
+                                String nombre = respuestaJson.optString("nombre", "error");
+                                int monedas = respuestaJson.optInt("monedas", 0);
+                                int victs = respuestaJson.optInt("victs", 0);
+                                int derrs = respuestaJson.optInt("derrs", 0);
+                                int empts = respuestaJson.optInt("empts", 0);
+
+                                Log.d("RESPUESTA", response.toString()); // Imprimir respuesta del servidor
+                                return Result.success(new Data.Builder()
+                                        .putString("message", mensaje)
+                                        .putString("code", codigo)
+                                        .putString("nombre", nombre)
+                                        .putInt("monedas", monedas)
+                                        .putInt("victs", victs)
+                                        .putInt("derrs", derrs)
+                                        .putInt("empts", empts)
+                                        .build());
+                            } else {
+                                Log.e("ERROR", "Error en la solicitud: " + responseCode);
+                                return Result.failure();
+                            }
+                        }else{
+                            return Result.failure();
+                        }
+                    } catch (IOException | JSONException e) {
+                        Log.e("WORKER", "Excepción en doWork: " + e.getMessage(), e);
+                        return Result.failure(new Data.Builder()
+                                .putString("message", "Excepción: " + e.getMessage())
+                                .putString("code", "-1")
+                                .build());
+                    } //break
                 case "monedas":
                     HttpURLConnection urlConnectionMonedas = null;
                     URL destinoMonedas = null;
@@ -299,6 +377,9 @@ public class conexionBDWebService extends Worker {
                         if(getInputData().getInt("id",0)!=0 && getInputData().getInt("monedas",0)!=0){
                             jsonParam.put("id", getInputData().getInt("id",0));
                             jsonParam.put("monedas", getInputData().getInt("monedas",0));
+                            if(getInputData().getString("empate")!=null){
+                                jsonParam.put("empate", getInputData().getString("empate"));
+                            }
                             paramsValidos = true;
                         }
 

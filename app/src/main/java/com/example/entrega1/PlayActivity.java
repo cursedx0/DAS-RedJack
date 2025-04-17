@@ -36,6 +36,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.fragment.app.FragmentContainer;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.work.Data;
@@ -54,6 +55,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
+
+import android.content.SharedPreferences;
 
 public class PlayActivity extends BaseActivity {
     private boolean jugandoFlag = false;
@@ -307,7 +310,7 @@ public class PlayActivity extends BaseActivity {
         modificacion.put("Coins",Integer.toString(saldo));
         bd.update("Usuarios", modificacion, "Id=?",new String[]{Integer.toString(id)});*/
 
-        sumaRestaSaldoBD("restar", apuesta, id);
+        sumaRestaSaldoBD("restar", apuesta, id, false);
 
         // 2. IU Y SE REPARTEN CARTAS
         buttonApostar.setVisibility(View.INVISIBLE);
@@ -462,6 +465,12 @@ public class PlayActivity extends BaseActivity {
         buttonPlantarse.setVisibility(View.INVISIBLE);
         buttonTotal1.setVisibility(View.INVISIBLE);
         buttonTotal2.setVisibility(View.INVISIBLE);
+
+        //guardar tiempo de ultima partida
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = prefs.edit();
+        editor.putLong("ultima_partida_cuando", System.currentTimeMillis());
+        editor.apply();
     }
 
     private void jugadorPierde(){
@@ -489,7 +498,7 @@ public class PlayActivity extends BaseActivity {
         modificacion.put("Coins",Integer.toString(saldo));
         bd.update("Usuarios", modificacion, "Id=?",new String[]{Integer.toString(id)});*/
 
-        sumaRestaSaldoBD("sumar", apuesta*2, id);
+        sumaRestaSaldoBD("sumar", apuesta*2, id, false);
 
         verificarArchivo();
         guardarPartida(formatearResultado(saldo,apuesta,puntos,posiblesdealer,getString(R.string.hasganado)));
@@ -508,7 +517,7 @@ public class PlayActivity extends BaseActivity {
         bd.update("Usuarios", modificacion, "Id=?",new String[]{Integer.toString(id)});*/
 
         //reembolso
-        sumaRestaSaldoBD("sumar", apuesta, id);
+        sumaRestaSaldoBD("sumar", apuesta, id, true);
 
         verificarArchivo();
         guardarPartida(formatearResultado(saldo,apuesta,puntos,posiblesdealer,getString(R.string.empate)));
@@ -672,7 +681,7 @@ public class PlayActivity extends BaseActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void sumaRestaSaldoBD(String op, int monedas, int id){ //operacion, monedas a sumar/restar, id usuario
+    public void sumaRestaSaldoBD(String op, int monedas, int id, boolean empate){ //operacion, monedas a sumar/restar, id usuario
         int monedasahora = -1;
         if(id>0) {
             Data datos = new Data.Builder()
@@ -680,6 +689,7 @@ public class PlayActivity extends BaseActivity {
                     .putString("accion", op) //obtiene monedas de usuario
                     .putInt("id", id)
                     .putInt("monedas",monedas)
+                    .putString("empate","true")
                     .build();
 
             OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(conexionBDWebService.class)
