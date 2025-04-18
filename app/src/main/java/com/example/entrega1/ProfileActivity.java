@@ -14,6 +14,9 @@ import android.provider.MediaStore;
 import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -94,6 +97,7 @@ public class ProfileActivity extends BaseActivity {
         pfp = findViewById(R.id.pfp);
         ImageButton buttonCam = findViewById(R.id.buttonCam);
         ImageButton buttonGallery = findViewById(R.id.buttonGallery);
+        Button buttonAtras = findViewById(R.id.buttonAtrasProfile);
 
         textUser.setText(nombre);
 
@@ -289,6 +293,13 @@ public class ProfileActivity extends BaseActivity {
                 permissionLauncher.launch(permissions);
             } else {
                 abrirGaleria();
+            }
+        });
+
+        buttonAtras.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
             }
         });
 

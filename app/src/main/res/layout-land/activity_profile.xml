@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar4"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:minHeight="?attr/actionBarSize"
+        android:theme="?attr/actionBarTheme"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/pfp"
+        android:layout_width="179dp"
+        android:layout_height="164dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.045"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar4"
+        tools:srcCompat="@tools:sample/avatars" />
+
+    <TextView
+        android:id="@+id/iEmpts"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="100dp"
+        android:layout_marginTop="24dp"
+        android:text="@string/cargando"
+        app:layout_constraintStart_toEndOf="@+id/textDerrs"
+        app:layout_constraintTop_toBottomOf="@+id/iVicts" />
+
+    <Button
+        android:id="@+id/buttonAtrasProfile"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
+        android:text="@string/atras"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.919"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/textUser"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="TextView"
+        android:textSize="40dp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.052"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/pfp" />
+
+    <TextView
+        android:id="@+id/textDerrs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="112dp"
+        android:layout_marginTop="24dp"
+        android:text="@string/derrotas"
+        app:layout_constraintStart_toEndOf="@+id/pfp"
+        app:layout_constraintTop_toBottomOf="@+id/textVicts" />
+
+    <TextView
+        android:id="@+id/textVicts"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="113dp"
+        android:layout_marginTop="18dp"
+        android:text="@string/victorias"
+        app:layout_constraintStart_toEndOf="@+id/pfp"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar4" />
+
+    <TextView
+        android:id="@+id/textView9"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="113dp"
+        android:layout_marginTop="44dp"
+        android:text="@string/monedas"
+        app:layout_constraintStart_toEndOf="@+id/pfp"
+        app:layout_constraintTop_toTopOf="@+id/textManos" />
+
+    <ImageButton
+        android:id="@+id/buttonCam"
+        android:layout_width="63dp"
+        android:layout_height="63dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="276dp"
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/pfp"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar4"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@drawable/cameraimg" />
+
+    <TextView
+        android:id="@+id/textEstatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="113dp"
+        android:layout_marginTop="27dp"
+        android:text="@string/estatus"
+        app:layout_constraintStart_toEndOf="@+id/pfp"
+        app:layout_constraintTop_toBottomOf="@+id/textView9" />
+
+    <TextView
+        android:id="@+id/iVicts"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="100dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/cargando"
+        app:layout_constraintStart_toEndOf="@+id/textVicts"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar4" />
+
+    <TextView
+        android:id="@+id/textManos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="113dp"
+        android:layout_marginTop="25dp"
+        android:text="@string/partidasJugadas"
+        app:layout_constraintStart_toEndOf="@+id/pfp"
+        app:layout_constraintTop_toBottomOf="@+id/textEmpts" />
+
+    <TextView
+        android:id="@+id/iManos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="59dp"
+        android:layout_marginTop="27dp"
+        android:text="@string/cargando"
+        app:layout_constraintStart_toEndOf="@+id/textManos"
+        app:layout_constraintTop_toBottomOf="@+id/iDerrs" />
+
+    <TextView
+        android:id="@+id/iMonedas"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="97dp"
+        android:layout_marginTop="25dp"
+        android:text="@string/cargando"
+        app:layout_constraintStart_toEndOf="@+id/textView9"
+        app:layout_constraintTop_toBottomOf="@+id/iManos" />
+
+    <TextView
+        android:id="@+id/iEstatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="108dp"
+        android:layout_marginTop="28dp"
+        android:text="@string/cargando"
+        app:layout_constraintStart_toEndOf="@+id/textEstatus"
+        app:layout_constraintTop_toBottomOf="@+id/iMonedas" />
+
+    <TextView
+        android:id="@+id/textEmpts"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="113dp"
+        android:layout_marginTop="28dp"
+        android:text="@string/empates"
+        app:layout_constraintStart_toEndOf="@+id/pfp"
+        app:layout_constraintTop_toBottomOf="@+id/textDerrs" />
+
+    <TextView
+        android:id="@+id/iDerrs"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="100dp"
+        android:layout_marginTop="28dp"
+        android:text="@string/cargando"
+        app:layout_constraintStart_toEndOf="@+id/textEmpts"
+        app:layout_constraintTop_toBottomOf="@+id/iEmpts" />
+
+    <ImageButton
+        android:id="@+id/buttonGallery"
+        android:layout_width="63dp"
+        android:layout_height="63dp"
+        android:layout_marginTop="1dp"
+        android:layout_marginBottom="212dp"
+        android:scaleType="fitXY"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/pfp"
+        app:layout_constraintTop_toBottomOf="@+id/buttonCam"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@drawable/galleryimg" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

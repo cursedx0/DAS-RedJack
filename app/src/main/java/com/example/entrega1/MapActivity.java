@@ -109,6 +109,13 @@ public class MapActivity extends BaseActivity {
                 rutinaUbicacion();
             }
         });
+
+        buttonAtras.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
     }
 
     private void requestLocationPermission() {
