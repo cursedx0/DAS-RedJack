@@ -89,4 +89,5 @@
     <string name="estatus">Status</string>
     <string name="monedas">Coins</string>
     <string name="cargando">Loading</string>
+    <string name="jugar">Play</string>
 </resources>

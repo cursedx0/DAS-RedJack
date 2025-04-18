@@ -89,4 +89,5 @@
     <string name="estatus">Estatus</string>
     <string name="monedas">Monedas</string>
     <string name="cargando">Cargando</string>
+    <string name="jugar">Jugar</string>
 </resources>

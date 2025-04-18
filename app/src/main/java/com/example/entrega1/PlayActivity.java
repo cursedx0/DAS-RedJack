@@ -682,14 +682,15 @@ public class PlayActivity extends BaseActivity {
     }
 
     public void sumaRestaSaldoBD(String op, int monedas, int id, boolean empate){ //operacion, monedas a sumar/restar, id usuario
-        int monedasahora = -1;
+        String empt = "";
+        if(empate){empt="true";}
         if(id>0) {
             Data datos = new Data.Builder()
                     .putString("url","1") //url a php gestor de monedas
                     .putString("accion", op) //obtiene monedas de usuario
                     .putInt("id", id)
                     .putInt("monedas",monedas)
-                    .putString("empate","true")
+                    .putString("empate",empt)
                     .build();
 
             OneTimeWorkRequest request = new OneTimeWorkRequest.Builder(conexionBDWebService.class)

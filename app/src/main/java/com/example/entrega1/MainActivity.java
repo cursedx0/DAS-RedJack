@@ -8,6 +8,7 @@ import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -27,6 +28,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.work.Data;
@@ -187,6 +189,11 @@ public class MainActivity extends BaseActivity {
                                         int id = workInfo.getOutputData().getInt("id",0);
                                         String nombre = workInfo.getOutputData().getString("nombre");
                                         int monedas = workInfo.getOutputData().getInt("monedas",0);
+
+                                        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(MainActivity.this);
+                                        SharedPreferences.Editor editor = prefs.edit();
+                                        editor.putString("nombre", nombre);
+                                        editor.apply();
 
                                         Intent intent = new Intent(MainActivity.this, PlayActivity.class);
                                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
