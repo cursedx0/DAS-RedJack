@@ -566,12 +566,13 @@ public class conexionBDWebService extends Worker {
                                 JSONObject respuestaJson = new JSONObject(response.toString());
                                 String mensaje = respuestaJson.optString("message", "Sin mensaje");
                                 String codigo = respuestaJson.optString("code", "-1");
-                                int id = respuestaJson.optInt("id", 0);
+                                String url = respuestaJson.optString("url", null);
 
                                 Log.d("RESPUESTA", response.toString()); // Imprimir respuesta del servidor
                                 return Result.success(new Data.Builder()
                                         .putString("message", mensaje)
                                         .putString("code", codigo)
+                                        .putString("url", url)
                                         .build());
                             } else {
                                 Log.e("ERROR", "Error en la solicitud: " + responseCode);

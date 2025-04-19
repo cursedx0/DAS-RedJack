@@ -10,6 +10,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.MediaStore;
 import android.util.Base64;
 import android.util.Log;
@@ -44,6 +46,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import java.io.ByteArrayOutputStream;
+import java.util.Random;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -51,6 +54,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import android.Manifest;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.signature.ObjectKey;
 
 public class ProfileActivity extends BaseActivity {
 
@@ -378,6 +382,36 @@ public class ProfileActivity extends BaseActivity {
                     .build();
 
             WorkManager.getInstance(ProfileActivity.this).enqueue(request);
+
+            WorkManager.getInstance(getApplicationContext())
+                    .getWorkInfoByIdLiveData(request.getId())
+                    .observe(ProfileActivity.this, workInfo -> {
+                        if (workInfo != null && workInfo.getState().isFinished()) {
+                            if (workInfo.getState() == WorkInfo.State.SUCCEEDED) {
+                                String mensaje = workInfo.getOutputData().getString("message");
+                                Log.d("WORKER", "¡200! " + mensaje);
+                                String code = workInfo.getOutputData().getString("code");
+                                if(code.equals("0")) {
+                                    String url = workInfo.getOutputData().getString("url");
+                                    String urlConId = url + "?nocache=" + System.currentTimeMillis();
+                                    if (url != null) {
+                                        Glide.with(this)
+                                                .load(urlConId)
+                                                .placeholder(R.drawable.icono_rombo)
+                                                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                                                .skipMemoryCache(true)
+                                                .into(pfp);
+                                    } else {
+                                        pfp.setImageResource(R.drawable.icono_rombo);
+                                    }
+                                } else {
+                                    Log.d("OBTENER IMAGEN", "FALLÓ con código: " + code);
+                                }
+                            } else {
+                                Log.e("WORKER", "Algo falló en setpfp.");
+                            }
+                        }
+                    });
 
             //escuchar resultado
             /*
