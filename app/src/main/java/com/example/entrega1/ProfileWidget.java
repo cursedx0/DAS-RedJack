@@ -39,6 +39,8 @@ public class ProfileWidget extends AppWidgetProvider {
         views.setTextViewText(R.id.textWVicts,context.getString(R.string.victorias));
         views.setTextViewText(R.id.textWDerrs,context.getString(R.string.derrotas));
         views.setTextViewText(R.id.textWEmpts,context.getString(R.string.empates));
+        views.setTextViewText(R.id.textWSaldo,context.getString(R.string.monedas));
+        views.setTextViewText(R.id.buttonWJugar,context.getString(R.string.jugar));
 
         if(v!=-1) {
             views.setTextViewText(R.id.textWUser, nombre);
