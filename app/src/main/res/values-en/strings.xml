@@ -90,4 +90,5 @@
     <string name="monedas">Coins</string>
     <string name="cargando">Loading</string>
     <string name="jugar">Play</string>
+    <string name="requierePermisosGal">This function requires gallery permissions.</string>
 </resources>

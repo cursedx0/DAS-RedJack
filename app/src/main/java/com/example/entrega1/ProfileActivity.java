@@ -112,7 +112,7 @@ public class ProfileActivity extends BaseActivity {
                     if (readGranted) {
                         abrirGaleria();
                     } else {
-                        Toast.makeText(this, "Permiso de lectura requerido", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, getString(R.string.requierePermisosGal), Toast.LENGTH_SHORT).show();
                     }
                 }
         );
@@ -197,11 +197,6 @@ public class ProfileActivity extends BaseActivity {
                                 Log.d("WORKER", "¡200! " + mensaje);
                                 String code = workInfo.getOutputData().getString("code");
                                 if(code.equals("0")) {
-                                    /*String v = workInfo.getOutputData().getString("victs");
-                                    String d = workInfo.getOutputData().getString("derrs");
-                                    String e = workInfo.getOutputData().getString("empts");
-                                    String s = workInfo.getOutputData().getString("monedas");*/
-
                                     int v = workInfo.getOutputData().getInt("victs",0);
                                     int d = workInfo.getOutputData().getInt("derrs",0);
                                     int e = workInfo.getOutputData().getInt("empts",0);
@@ -412,44 +407,6 @@ public class ProfileActivity extends BaseActivity {
                             }
                         }
                     });
-
-            //escuchar resultado
-            /*
-            WorkManager.getInstance(getApplicationContext())
-                    .getWorkInfoByIdLiveData(request.getId())
-                    .observe(ProfileActivity.this, workInfo -> {
-                        if (workInfo != null && workInfo.getState().isFinished()) {
-                            if (workInfo.getState() == WorkInfo.State.SUCCEEDED) {
-                                String mensaje = workInfo.getOutputData().getString("message");
-                                Log.d("WORKER", "¡200! " + mensaje);
-                                String code = workInfo.getOutputData().getString("code");
-                                if(code.equals("0")) {
-                                    //coger foto
-                                    String url = workInfo.getOutputData().getString("url");
-                                    String urlConId = url + "?nocache=" + System.currentTimeMillis();
-                                    if (url!=null) {
-                                        //byte[] decodedString = Base64.decode(fotoraw, Base64.DEFAULT);
-                                        //Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
-                                        //pfp.setImageBitmap(decodedByte);
-                                        Glide.with(this)
-                                                .load(urlConId)
-                                                .placeholder(R.drawable.icono_rombo)
-                                                .diskCacheStrategy(DiskCacheStrategy.NONE)
-                                                .skipMemoryCache(true)
-                                                .into(pfp);
-                                    }else{
-                                        pfp.setImageResource(R.drawable.icono_rombo);
-                                    }
-                                }else{
-                                    //error total
-                                    Log.d("OBETENER IMAGEN", "FALLÓ");
-                                }
-                            } else {
-                                Log.e("WORKER", "Algo falló.");
-                            }
-                        }
-                    });*/
-
         }else{
             Toast.makeText(getApplicationContext(), getString(R.string.masCampos), Toast.LENGTH_SHORT).show();
         }

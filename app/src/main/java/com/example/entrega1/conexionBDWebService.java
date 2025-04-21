@@ -71,7 +71,7 @@ public class conexionBDWebService extends Worker {
                         urlConnection.setDoOutput(true);
                         urlConnection.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
 
-                        // Crear JSON con los parámetros
+                        //crear JSON con los parámetros
                         JSONObject jsonParam = new JSONObject();
                         jsonParam.put("accion", accion);
 
@@ -88,7 +88,7 @@ public class conexionBDWebService extends Worker {
                         Log.d("WORKER", "JSON definido");
                         Log.d("WORKER", "JSON a enviar: " + jsonParam.toString());
                         if (paramsValidos) {
-                            // Escribir el JSON en el cuerpo de la solicitud
+                            //escribir el JSON en el cuerpo de la solicitud
                             OutputStream os = urlConnection.getOutputStream();
                             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
                             writer.write(jsonParam.toString());
@@ -96,7 +96,7 @@ public class conexionBDWebService extends Worker {
                             writer.close();
                             os.close();
 
-                            // Enviar la solicitud y recibir la respuesta
+                            //enviar la solicitud y recibir la respuesta
                             int responseCode = urlConnection.getResponseCode();
                             if (responseCode == HttpURLConnection.HTTP_OK) {
                                 BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(), StandardCharsets.UTF_8));
@@ -107,7 +107,7 @@ public class conexionBDWebService extends Worker {
                                 }
                                 br.close();
 
-                                // Parsear respuesta JSON
+                                //parsear respuesta JSON
                                 JSONObject respuestaJson = new JSONObject(response.toString());
                                 String mensaje = respuestaJson.optString("message", "Sin mensaje");
                                 String codigo = respuestaJson.optString("code", "-1");
@@ -144,7 +144,7 @@ public class conexionBDWebService extends Worker {
                         urlConnectionLogin.setDoOutput(true);
                         urlConnectionLogin.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
 
-                        // Crear JSON con los parámetros
+                        //crear JSON con los parámetros
                         JSONObject jsonParam = new JSONObject();
                         jsonParam.put("accion", accion);
 
@@ -157,7 +157,7 @@ public class conexionBDWebService extends Worker {
                         Log.d("WORKER", "JSON definido");
                         Log.d("WORKER", "JSON a enviar: " + jsonParam.toString());
                         if (paramsValidos) {
-                            // Escribir el JSON en el cuerpo de la solicitud
+                            //escribir el JSON en el cuerpo de la solicitud
                             OutputStream os = urlConnectionLogin.getOutputStream();
                             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
                             writer.write(jsonParam.toString());
@@ -165,7 +165,7 @@ public class conexionBDWebService extends Worker {
                             writer.close();
                             os.close();
 
-                            // Enviar la solicitud y recibir la respuesta
+                            //enviar la solicitud y recibir la respuesta
                             int responseCode = urlConnectionLogin.getResponseCode();
                             if (responseCode == HttpURLConnection.HTTP_OK) {
                                 BufferedReader br = new BufferedReader(new InputStreamReader(urlConnectionLogin.getInputStream(), StandardCharsets.UTF_8));
@@ -176,7 +176,7 @@ public class conexionBDWebService extends Worker {
                                 }
                                 br.close();
 
-                                // Parsear respuesta JSON
+                                //parsear respuesta JSON
                                 JSONObject respuestaJson = new JSONObject(response.toString());
                                 String mensaje = respuestaJson.optString("message", "Sin mensaje");
                                 String codigo = respuestaJson.optString("code", "-1");
@@ -222,7 +222,7 @@ public class conexionBDWebService extends Worker {
                         urlConnectionLogin.setDoOutput(true);
                         urlConnectionLogin.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
 
-                        // Crear JSON con los parámetros
+                        //crear JSON con los parámetros
                         JSONObject jsonParam = new JSONObject();
                         jsonParam.put("accion", accion);
 
@@ -234,7 +234,7 @@ public class conexionBDWebService extends Worker {
                         Log.d("WORKER", "JSON definido");
                         Log.d("WORKER", "JSON a enviar: " + jsonParam.toString());
                         if (paramsValidos) {
-                            // Escribir el JSON en el cuerpo de la solicitud
+                            //escribir el JSON en el cuerpo de la solicitud
                             OutputStream os = urlConnectionLogin.getOutputStream();
                             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
                             writer.write(jsonParam.toString());
@@ -242,7 +242,7 @@ public class conexionBDWebService extends Worker {
                             writer.close();
                             os.close();
 
-                            // Enviar la solicitud y recibir la respuesta
+                            //enviar la solicitud y recibir la respuesta
                             int responseCode = urlConnectionLogin.getResponseCode();
                             if (responseCode == HttpURLConnection.HTTP_OK) {
                                 BufferedReader br = new BufferedReader(new InputStreamReader(urlConnectionLogin.getInputStream(), StandardCharsets.UTF_8));
@@ -253,7 +253,7 @@ public class conexionBDWebService extends Worker {
                                 }
                                 br.close();
 
-                                // Parsear respuesta JSON
+                                //parsear respuesta JSON
                                 JSONObject respuestaJson = new JSONObject(response.toString());
                                 String mensaje = respuestaJson.optString("message", "Sin mensaje");
                                 String codigo = respuestaJson.optString("code", "-1");
@@ -311,7 +311,7 @@ public class conexionBDWebService extends Worker {
                         Log.d("WORKER", "JSON definido");
                         Log.d("WORKER", "JSON a enviar: " + jsonParam.toString());
                         if (paramsValidos) {
-                            // Escribir el JSON en el cuerpo de la solicitud
+                            //escribir el JSON en el cuerpo de la solicitud
                             OutputStream os = urlConnectionMonedas.getOutputStream();
                             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
                             writer.write(jsonParam.toString());
@@ -319,7 +319,7 @@ public class conexionBDWebService extends Worker {
                             writer.close();
                             os.close();
 
-                            // Enviar la solicitud y recibir la respuesta
+                            //enviar la solicitud y recibir la respuesta
                             int responseCode = urlConnectionMonedas.getResponseCode();
                             if (responseCode == HttpURLConnection.HTTP_OK) {
                                 BufferedReader br = new BufferedReader(new InputStreamReader(urlConnectionMonedas.getInputStream(), StandardCharsets.UTF_8));
@@ -330,7 +330,7 @@ public class conexionBDWebService extends Worker {
                                 }
                                 br.close();
 
-                                // Parsear respuesta JSON
+                                //parsear respuesta JSON
                                 JSONObject respuestaJson = new JSONObject(response.toString());
                                 String mensaje = respuestaJson.optString("message", "Sin mensaje");
                                 String codigo = respuestaJson.optString("code", "-1");
@@ -370,7 +370,7 @@ public class conexionBDWebService extends Worker {
                         urlConnectionSumar.setDoOutput(true);
                         urlConnectionSumar.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
 
-                        // Crear JSON con los parámetros
+                        //crear JSON con los parámetros
                         JSONObject jsonParam = new JSONObject();
                         jsonParam.put("accion", accion);
 
@@ -386,7 +386,7 @@ public class conexionBDWebService extends Worker {
                         Log.d("WORKER", "JSON definido");
                         Log.d("WORKER", "JSON a enviar: " + jsonParam.toString());
                         if (paramsValidos) {
-                            // Escribir el JSON en el cuerpo de la solicitud
+                            //escribir el JSON en el cuerpo de la solicitud
                             OutputStream os = urlConnectionSumar.getOutputStream();
                             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
                             writer.write(jsonParam.toString());
@@ -394,7 +394,7 @@ public class conexionBDWebService extends Worker {
                             writer.close();
                             os.close();
 
-                            // Enviar la solicitud y recibir la respuesta
+                            //enviar la solicitud y recibir la respuesta
                             int responseCode = urlConnectionSumar.getResponseCode();
                             if (responseCode == HttpURLConnection.HTTP_OK) {
                                 BufferedReader br = new BufferedReader(new InputStreamReader(urlConnectionSumar.getInputStream(), StandardCharsets.UTF_8));
@@ -405,7 +405,7 @@ public class conexionBDWebService extends Worker {
                                 }
                                 br.close();
 
-                                // Parsear respuesta JSON
+                                //parsear respuesta JSON
                                 JSONObject respuestaJson = new JSONObject(response.toString());
                                 String mensaje = respuestaJson.optString("message", "Sin mensaje");
                                 String codigo = respuestaJson.optString("code", "-1");
@@ -445,7 +445,7 @@ public class conexionBDWebService extends Worker {
                         urlConnectionRestar.setDoOutput(true);
                         urlConnectionRestar.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
 
-                        // Crear JSON con los parámetros
+                        //crear JSON con los parámetros
                         JSONObject jsonParam = new JSONObject();
                         jsonParam.put("accion", accion);
 
@@ -458,7 +458,7 @@ public class conexionBDWebService extends Worker {
                         Log.d("WORKER", "JSON definido");
                         Log.d("WORKER", "JSON a enviar: " + jsonParam.toString());
                         if (paramsValidos) {
-                            // Escribir el JSON en el cuerpo de la solicitud
+                            //escribir el JSON en el cuerpo de la solicitud
                             OutputStream os = urlConnectionRestar.getOutputStream();
                             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
                             writer.write(jsonParam.toString());
@@ -466,7 +466,7 @@ public class conexionBDWebService extends Worker {
                             writer.close();
                             os.close();
 
-                            // Enviar la solicitud y recibir la respuesta
+                            //enviar la solicitud y recibir la respuesta
                             int responseCode = urlConnectionRestar.getResponseCode();
                             if (responseCode == HttpURLConnection.HTTP_OK) {
                                 BufferedReader br = new BufferedReader(new InputStreamReader(urlConnectionRestar.getInputStream(), StandardCharsets.UTF_8));
@@ -477,14 +477,14 @@ public class conexionBDWebService extends Worker {
                                 }
                                 br.close();
 
-                                // Parsear respuesta JSON
+                                //parsear respuesta JSON
                                 JSONObject respuestaJson = new JSONObject(response.toString());
                                 String mensaje = respuestaJson.optString("message", "Sin mensaje");
                                 String codigo = respuestaJson.optString("code", "-1");
                                 int id = respuestaJson.optInt("id", 0);
                                 int monedas = respuestaJson.optInt("monedas", 0);
 
-                                Log.d("RESPUESTA", response.toString()); // Imprimir respuesta del servidor
+                                Log.d("RESPUESTA", response.toString()); //imprimir respuesta del servidor
                                 return Result.success(new Data.Builder()
                                         .putString("message", mensaje)
                                         .putString("code", codigo)
@@ -517,7 +517,7 @@ public class conexionBDWebService extends Worker {
                         urlConnectionSetPfp.setDoOutput(true);
                         urlConnectionSetPfp.setRequestProperty("Content-Type", "application/json; charset=UTF-8");
 
-                        // Crear JSON con los parámetros
+                        //crear JSON con los parámetros
                         JSONObject jsonParam = new JSONObject();
                         jsonParam.put("accion", accion);
 
@@ -543,7 +543,7 @@ public class conexionBDWebService extends Worker {
                         Log.d("WORKER", "JSON definido");
                         Log.d("WORKER", "JSON a enviar: " + jsonParam.toString());
                         if (paramsValidos) {
-                            // Escribir el JSON en el cuerpo de la solicitud
+                            //escribir el JSON en el cuerpo de la solicitud
                             OutputStream os = urlConnectionSetPfp.getOutputStream();
                             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
                             writer.write(jsonParam.toString());
@@ -551,7 +551,7 @@ public class conexionBDWebService extends Worker {
                             writer.close();
                             os.close();
 
-                            // Enviar la solicitud y recibir la respuesta
+                            //enviar la solicitud y recibir la respuesta
                             int responseCode = urlConnectionSetPfp.getResponseCode();
                             if (responseCode == HttpURLConnection.HTTP_OK) {
                                 BufferedReader br = new BufferedReader(new InputStreamReader(urlConnectionSetPfp.getInputStream(), StandardCharsets.UTF_8));
@@ -562,13 +562,13 @@ public class conexionBDWebService extends Worker {
                                 }
                                 br.close();
 
-                                // Parsear respuesta JSON
+                                //parsear respuesta JSON
                                 JSONObject respuestaJson = new JSONObject(response.toString());
                                 String mensaje = respuestaJson.optString("message", "Sin mensaje");
                                 String codigo = respuestaJson.optString("code", "-1");
                                 String url = respuestaJson.optString("url", null);
 
-                                Log.d("RESPUESTA", response.toString()); // Imprimir respuesta del servidor
+                                Log.d("RESPUESTA", response.toString()); //imprimir respuesta del servidor
                                 return Result.success(new Data.Builder()
                                         .putString("message", mensaje)
                                         .putString("code", codigo)
@@ -612,7 +612,7 @@ public class conexionBDWebService extends Worker {
                         Log.d("WORKER", "JSON definido");
                         Log.d("WORKER", "JSON a enviar: " + jsonParam.toString());
                         if (paramsValidos) {
-                            // Escribir el JSON en el cuerpo de la solicitud
+                            //escribir el JSON en el cuerpo de la solicitud
                             OutputStream os = urlConnectionGetPfp.getOutputStream();
                             BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(os, "UTF-8"));
                             writer.write(jsonParam.toString());
@@ -620,7 +620,7 @@ public class conexionBDWebService extends Worker {
                             writer.close();
                             os.close();
 
-                            // Enviar la solicitud y recibir la respuesta
+                            //enviar la solicitud y recibir la respuesta
                             int responseCode = urlConnectionGetPfp.getResponseCode();
                             if (responseCode == HttpURLConnection.HTTP_OK) {
                                 BufferedReader br = new BufferedReader(new InputStreamReader(urlConnectionGetPfp.getInputStream(), StandardCharsets.UTF_8));
@@ -631,7 +631,7 @@ public class conexionBDWebService extends Worker {
                                 }
                                 br.close();
 
-                                // Parsear respuesta JSON
+                                //parsear respuesta JSON
                                 JSONObject respuestaJson = new JSONObject(response.toString());
                                 String mensaje = respuestaJson.optString("message", "Sin mensaje");
                                 String codigo = respuestaJson.optString("code", "-1");
@@ -639,7 +639,7 @@ public class conexionBDWebService extends Worker {
                                 String url = respuestaJson.optString("url","Sin url.");
                                 int id = respuestaJson.optInt("id", 0);
 
-                                Log.d("RESPUESTA", response.toString()); // Imprimir respuesta del servidor
+                                Log.d("RESPUESTA", response.toString()); //imprimir respuesta del servidor
                                 return Result.success(new Data.Builder()
                                         .putString("message", mensaje)
                                         .putString("code", codigo)
@@ -662,16 +662,6 @@ public class conexionBDWebService extends Worker {
                     } //break
             }
         }
-
-        /*HttpURLConnection urlConnection = null;
-        try {
-            URL destino = new URL(direccion);
-            urlConnection = (HttpURLConnection) destino.openConnection();
-            urlConnection.setConnectTimeout(5000);
-            urlConnection.setReadTimeout(5000);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }*/
         return null;
     }
 }

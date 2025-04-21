@@ -64,7 +64,7 @@ public class ProfileWidget extends AppWidgetProvider {
             views.setTextViewText(R.id.iWSaldo, s2 + "");
         }
 
-        // Botón para abrir la app
+        //botón para abrir la app
         Intent intent = new Intent(context, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE);
         views.setOnClickPendingIntent(R.id.buttonWJugar, pendingIntent);

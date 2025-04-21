@@ -58,7 +58,7 @@ public class MapActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Configuración de osmdroid
+        //configuración de osmdroid
         Context ctx = getApplicationContext();
         Configuration.getInstance().load(ctx, PreferenceManager.getDefaultSharedPreferences(ctx));
         Configuration.getInstance().setUserAgentValue(getPackageName());
@@ -72,7 +72,7 @@ public class MapActivity extends BaseActivity {
 
         setContentView(R.layout.activity_map);
 
-        // Inicializar UI
+        //inicializar UI
         textAsk = findViewById(R.id.textViewRequisito);
         buttonAsk = findViewById(R.id.buttonAskMe);
         buttonAtras = findViewById(R.id.buttonAtrasMap);
@@ -80,15 +80,15 @@ public class MapActivity extends BaseActivity {
         ikms = findViewById(R.id.inputKms);
         map = findViewById(R.id.map);
 
-        // Configurar el mapa de OSM
+        //configurar el mapa de OSM
         map.setTileSource(TileSourceFactory.MAPNIK);
         map.getZoomController().setVisibility(CustomZoomButtonsController.Visibility.ALWAYS);
         map.setMultiTouchControls(true);
 
-        // Inicializar el administrador de ubicación
+        //inicializar el administrador de ubicación
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
-        // Verificar y solicitar permisos de ubicación
+        //verificar y solicitar permisos de ubicación
         buttonAsk.setOnClickListener(new View.OnClickListener() {
             @Override
              public void onClick(View v) {
@@ -122,12 +122,12 @@ public class MapActivity extends BaseActivity {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION)
                 != PackageManager.PERMISSION_GRANTED) {
 
-            // Si no tiene permisos, solicitarlos
+            //si no tiene permisos, solicitarlos
             ActivityCompat.requestPermissions(this,
                     new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
                     LOCATION_PERMISSION_REQUEST_CODE);
         } else {
-            // Si ya tiene permisos, iniciar la ubicación
+            //si ya tiene permisos, iniciar la ubicación
             startLocationUpdates();
         }
     }
@@ -168,7 +168,7 @@ public class MapActivity extends BaseActivity {
 
             rutinaUbicacion();
 
-            // Definir el listener de ubicación
+            //definir el listener de ubicación
             locationListener = new LocationListener() {
                 @Override
                 public void onLocationChanged(@NonNull Location location) {
@@ -177,12 +177,12 @@ public class MapActivity extends BaseActivity {
 
                     Log.i("UBICACIÓN", "Latitud: " + latitude + ", Longitud: " + longitude);
 
-                    // Actualizar el mapa con la ubicación
+                    //actualizar el mapa con la ubicación
                     updateMapLocation(latitude, longitude);
                 }
             };
 
-            // Solicitar actualizaciones de ubicación con GPS
+            //solicitar actualizaciones de ubicación con GPS
             locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, locationListener);
         }
     }
@@ -191,14 +191,14 @@ public class MapActivity extends BaseActivity {
         if(map!=null) {
             GeoPoint userLocation = new GeoPoint(latitude, longitude);
 
-            // Centrar el mapa en la ubicación del usuario
+            //centrar el mapa en la ubicación del usuario
             map.getController().setCenter(userLocation);
             //map.getController().setZoom(18.0); //esto puede resultar incómodo
 
-            // Eliminar marcadores previos
+            //eliminar marcadores previos
             map.getOverlays().clear();
 
-            // Crear y agregar un nuevo marcador en la ubicación actual
+            //crear y agregar un nuevo marcador en la ubicación actual
             Marker marker = new Marker(map);
             marker.setPosition(userLocation);
             marker.setTitle("Ubicación actual");

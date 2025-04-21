@@ -195,6 +195,41 @@ public class MainActivity extends BaseActivity {
                                         editor.putString("nombre", nombre);
                                         editor.apply();
 
+                                        boolean notisLogin = prefs.getBoolean("notis_login", true); // usa este valor en el momento
+
+                                        if(notisLogin){ //la notificación se manda aquí, porque de mandarse en el onCreate de PlayActivity se mandaría cada vez que se recree la actividad (como al cambiar el tema o idioma)
+                                            Context context = getApplicationContext();
+                                            NotificationManager elManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+                                            if (elManager == null) {
+                                                Log.e("Notificación", "NotificationManager es null. No se puede crear la notificación.");
+                                                return;
+                                            }
+
+                                            String canalID = "LogIn";
+
+                                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                                                NotificationChannel elCanal = new NotificationChannel(
+                                                        canalID, "Canal de Inicio de Sesión",
+                                                        NotificationManager.IMPORTANCE_HIGH
+                                                );
+                                                elCanal.setDescription("Notificación recibida al iniciar sesión.");
+                                                elCanal.setVibrationPattern(new long[]{0, 500, 500, 500});
+                                                elCanal.enableVibration(true);
+
+                                                elManager.createNotificationChannel(elCanal); //crea canal
+                                            }
+
+                                            NotificationCompat.Builder elBuilder = new NotificationCompat.Builder(context, canalID)
+                                                    .setSmallIcon(R.drawable.icono_rombo) //icono
+                                                    .setContentTitle(getString(R.string.bienvenido)+", "+user) //titulo
+                                                    .setContentText(getString(R.string.loginExitoso)) //texto
+                                                    .setPriority(NotificationCompat.PRIORITY_HIGH) //prioridad
+                                                    .setAutoCancel(true);
+
+                                            elManager.notify(1, elBuilder.build());
+                                        }
+
                                         Intent intent = new Intent(MainActivity.this, PlayActivity.class);
                                         intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                                         intent.putExtra("id", id);

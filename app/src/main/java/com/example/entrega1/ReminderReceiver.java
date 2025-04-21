@@ -39,7 +39,7 @@ public class ReminderReceiver extends BroadcastReceiver {
         createNotificationChannel(contextoConIdioma); //asegura el canal en Android 8+
 
         Random random = new Random();
-        int numero = random.nextInt(2); // Devuelve 0 o 1
+        int numero = random.nextInt(2); //devuelve 0 o 1
 
         String mensaje;
         if (numero == 0) {
